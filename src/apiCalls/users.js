@@ -60,17 +60,16 @@ export async function getAllUsers() {
     }
 }
 
-export async function updatePassword(id, password)
+export async function updatePassword(password, token)
 {
     try{
         const response = await fetch(BaseUrl + 'users/password', {
-            method: "POST",
+            method: "PATCH",
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Authorization': `Bearer ${token}`
             },
             body : JSON.stringify({
-                id,
                 password,
             })
         });

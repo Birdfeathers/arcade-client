@@ -3,29 +3,61 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import socketIOClient from "socket.io-client";
 const ENDPOINT = "http://127.0.0.1:4001";
-import {Renju, RenjuForm, Home, Login} from './Components'
+import {Renju, RenjuForm, Home, Login, Register, Profile} from './Components'
 
 function App() {
-  // const [response, setResponse] = useState("");
+  const [token, setToken] = useState('');
+  const [username, setUsername] = useState('');
+  const [userId, setUserId] = useState('');
 
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT);
     // socket.on("FromAPI", data => {
     //   setResponse(data);
     // });
-  }, []);
+
+    const fetchData = async () => {
+      console.log('useEffect running')
+      const storedToken = localStorage.getItem('token');
+      if(storedToken) setToken(storedToken);
+
+      const storedUsername = localStorage.getItem('username');
+      if(storedUsername) setUsername(storedUsername);
+
+
+    }
+    fetchData();
+  }, [token]);
 
   return<Router>
+    {token? <div>Logged in as {username}</div>: <div>You are not logged in</div>}
     <div id = "nav" >
         <Link to = '/'>Home</Link>
         <Link to = '/renju'>Renju/Tic-Tac-Toe</Link>
-        <Link to = '/login'>Login</Link>
+        { token?<>
+        <Link to = '/profile'> Profile </Link>
+        <Link to = '/' onClick = {() => {
+          if(window.confirm('Are you sure you want to log out?'))
+          {
+            setToken('');
+            setUsername('');
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+          } }}> Logout</Link>
+        </>: <>
+          <Link to = '/login'>Login</Link>
+          <Link to = '/register'>Register</Link>
+          </>
+        }
+
     </div>
     <Routes>
       <Route path = '/' element = {<Home/>}></Route>
       <Route path = '/renju' element={<Renju />}></Route>
       <Route path = '/renjuform' element = {<RenjuForm/>}></Route>
-      <Route path = '/login' element = {<Login/>}></Route>
+      <Route path = '/login' element = {<Login setToken = {setToken}/>}></Route>
+      <Route path = '/register' element = {<Register setToken = {setToken}/>}></Route>
+      <Route path = '/profile' element = {<Profile username = {username} token = {token}/>}></Route>
     </Routes>
   </Router>
 }

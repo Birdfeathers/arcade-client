@@ -1,32 +1,29 @@
 import React, { useState, useEffect } from "react";
-import ReactDOM from 'react-dom';
-import socketIOClient from "socket.io-client";
-const ENDPOINT = "http://127.0.0.1:4001";
 import {login, register} from '../apiCalls/index';
 import { useNavigate } from "react-router-dom";
 
-function Login({setToken})
+function Register({setToken})
 {
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
     let navigate = useNavigate();
     return<div>
-        <h1>Login</h1>
+        <h1>Register</h1>
         <form onSubmit = { async (event) => {
             event.preventDefault();
-            const result = await login(username, password);
-            if (result.error) alert(result.message); // error message(incorrect or missing info)
-            else {
-                // successful login
-                console.log(result);
-                localStorage.setItem('token', result.token);
-                localStorage.setItem('username', result.username);
-                setToken(result.token);
-                navigate("../");
-              
-                
-            }
-        }}>
+            if(password !== confirmPassword) alert('Password does match confirm password!');
+            else{
+                const result = await register(username, password);
+                if (result.error) alert(result.message);
+                else{
+                    alert('Successful login!');
+                    console.log(result);
+                    navigate('../login');
+
+                }
+            }}}>
             <input type = "text" placeholder = "username"  value={username}  
             onChange={(event) => {
                 setUserName(event.target.value);
@@ -35,9 +32,13 @@ function Login({setToken})
              onChange={(event) => {
                 setPassword(event.target.value);
             }}/>
+            <input type = "text" placeholder = "confirm password" value={confirmPassword}
+             onChange={(event) => {
+                setConfirmPassword(event.target.value);
+            }}/>
             <input type = "submit"/>
         </form>
     </div>
 }
 
-export default Login;
+export default Register;
