@@ -33,7 +33,6 @@ function App() {
     {token? <div>Logged in as {username}</div>: <div>You are not logged in</div>}
     <div id = "nav" >
         <Link to = '/'>Home</Link>
-        <Link to = '/renju'>Renju/Tic-Tac-Toe</Link>
         { token?<>
         <Link to = '/profile'> Profile </Link>
         <Link to = '/' onClick = {() => {
