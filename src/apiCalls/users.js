@@ -60,6 +60,21 @@ export async function getAllUsers() {
     }
 }
 
+export async function getUserById(id){
+    try{
+        const response = await fetch(BaseUrl + 'users/user/' + id, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const result = await response.json();
+        console.log(result);
+        return result;
+    } catch(error) {
+        throw error;
+    }
+}
+
 export async function updatePassword(password, token)
 {
     try{

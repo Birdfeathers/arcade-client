@@ -1,10 +1,16 @@
-import {register, login, getAllUsers, updatePassword} from './users';
+import {register, login, getAllUsers,getUserById, updatePassword} from './users';
+import { newGame, getGame, getGamesByUser, updateMoveHistory } from './games';
 
 export {
     login,
     register,
     getAllUsers, 
-    updatePassword
+    getUserById,
+    updatePassword,
+    newGame,
+    getGame,
+    getGamesByUser,
+    updateMoveHistory
 }
 
 

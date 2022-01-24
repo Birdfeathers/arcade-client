@@ -51,9 +51,9 @@ function App() {
 
     </div>
     <Routes>
-      <Route path = '/' element = {<Home/>}></Route>
+      <Route path = '/' element = {<Home token = {token}/>}></Route>
       <Route path = '/renju' element={<Renju />}></Route>
-      <Route path = '/renjuform' element = {<RenjuForm/>}></Route>
+      <Route path = '/renjuform' element = {<RenjuForm token = {token}/>}></Route>
       <Route path = '/login' element = {<Login setToken = {setToken}/>}></Route>
       <Route path = '/register' element = {<Register setToken = {setToken}/>}></Route>
       <Route path = '/profile' element = {<Profile username = {username} token = {token}/>}></Route>
