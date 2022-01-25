@@ -1,0 +1,188 @@
+body{
+    background-color: linen;
+}
+
+form{
+    border: 1px solid black;
+    padding: 5px;
+    box-shadow: 1px 2px gray;
+    background-color: white;
+}
+
+h1, h2{
+    text-align: center;
+}
+
+#player1p, #player2p{
+    width: 4.5vh;
+    height: 4.5vh;
+    margin: 4.5vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+ 
+}
+
+
+main{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5vh;
+    margin: 1vh;
+    background-image: url(/images/green.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+td {
+    width: 4.5vh;
+    height: 4.5vh;
+    position:relative;
+  
+
+  }
+
+  .circle{
+      border-radius: 50%;
+  }
+
+  .full{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .black{
+      background-color: black;
+  }
+
+  .white{
+      background-color: azure;
+  }
+
+  .wood{
+      /* background-color: sandybrown; */
+      background-image: url('/images/wood.jpg');
+      box-shadow: 5px 10px 10px black;
+      background-repeat: no-repeat;
+      background-size: cover;
+  }
+
+  .tan{
+      background-color: sandybrown;
+      height: 100%;
+  }
+
+.paper{
+    background-image: url('/images/paper.jpg');
+    padding: 5px;
+    box-shadow: 2px 4px black;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+  .fourth{
+      width: 50%;
+      height: 100%;
+
+  }
+
+  .border{
+    border: 2px solid black;
+  }
+
+
+  .borderLeft{
+      border-left: 2px solid black;;
+  }
+ 
+
+  .borderBottom{
+      border-bottom: 2px solid black;
+  }
+  
+
+  .flex{
+      display: flex;
+      flex-wrap: wrap;
+  }
+
+  
+
+  .top{
+      z-index: 10;
+  }
+
+  
+
+  .half{
+      height: 50%;
+      width: 100%;
+      display : flex;
+  }
+
+  .rotate45{
+      transform: rotate(45deg);
+  }
+
+  .rotate90{
+    transform: rotate(90deg);
+  }
+
+  .rotate135{
+    transform: rotate(135deg);
+  }
+
+  .most{
+      height: 80%;
+      width: 80%;
+      margin: 0 auto;
+  }
+  
+  .redBorder{
+      border-color: red;
+  }
+
+  .bigger{
+      height: 150%;
+      width: 150%;
+      position: absolute;
+      top: -25%;
+      left:-25%;
+  }
+
+  .shine{
+      box-shadow: 1px 2px darkgray;
+      /* box-shadow: inset -1px -1px white; */
+  }
+
+  .winBorder{
+      border: 3px solid gold;
+      width: 95%;
+      height: 95%;
+      z-index: 15;
+  }
+
+  .blackBorder{
+      border: 3px solid black !important;
+     
+  }
+
+  .whiteBorder{
+    border: 3px solid linen !important;
+   
+}
+
+  .transparentBorder{
+    border: 3px solid transparent;
+  }
+
+  @media screen and (max-width: 768px)
+  {
+      form{
+          font-size: x-large;
+      }
+  }

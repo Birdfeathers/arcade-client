@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {login, updatePassword, getGamesByUser, getUserById} from '../apiCalls/index';
+import {login, updatePassword, getGamesByUser} from '../apiCalls/index';
 import { useNavigate } from "react-router-dom";
 
 function ChangeUserPassword({username, token, setPasswordOpen})
@@ -14,7 +14,8 @@ function ChangeUserPassword({username, token, setPasswordOpen})
         else{
             const change = await updatePassword(newPassword, token );
             console.log(change);
-            alert('Password successfully changed.')
+            if(change.error) alert(change.message);
+            else alert('Password successfully changed.')
             setPasswordOpen(false);
         }
         }}>
@@ -30,32 +31,25 @@ function ChangeUserPassword({username, token, setPasswordOpen})
 
 function MyGames({token})
 {
-    const [activeGames, setActiveGames] = useState([]);
+    let navigate = useNavigate();
+    const [games, setGames] = useState([]);
     useEffect(() => {
         const fetchData = async () => {
           console.log('useEffect running');
           if(!token) return;
           const games = await getGamesByUser(token);
-          console.log(games);
-          if(games) {
-            const newGames = await Promise.all(games.filter(game => !game.winner).map(await async function(game) {
-                game.owner = await getUserById(game.owner);
-                game.playerOne = await getUserById(game.playerOne);
-                game.playerTwo = await getUserById(game.playerTwo);
-                return game;
-            }))
-            console.log("newGames", newGames);
-            setActiveGames(newGames);
-        
-        }}
+          if(games) setGames(games);
+    }
         fetchData();
       }, [token]);
       return<>
-        <h3>My Games:</h3>
-        { activeGames.map((game) => {
-        return<div key = {game.id}> 
+        <h3>Active Games:</h3>
+        { games.filter(game => !game.winner).map((game) => {
+        return<div key = {game.id} className = "border" onClick = {(event) => {
+            navigate(`../renju/${game.id}`);
+        }}> 
             <h5>Game</h5>
-            <p>Started by: {game.owner.username} | First Player: {game.playerOne.username} | Second Player: {game.playerTwo.username}</p>
+            <p>Started by: {game.ownerusername} | First Player: {game.playeroneusername} | Second Player: {game.playertwousername}</p>
             <p>Rows: {game.rows} Columns: {game.cols} | {game.towin} needed to win</p>
         </div>})}
 
@@ -71,7 +65,7 @@ function Profile({username, token})
             setPasswordOpen(!passwordOpen);
         }}> Change password</button>
         {passwordOpen? <ChangeUserPassword token = {token} username = {username} setPasswordOpen = {setPasswordOpen}/>: null}
-        <MyGames token = {token}/>
+        <MyGames token = {token} />
 
     </div>
 }

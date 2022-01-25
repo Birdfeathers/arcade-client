@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import socketIOClient from "socket.io-client";
 const ENDPOINT = "http://127.0.0.1:4001";
 import {Renju, RenjuForm, Home, Login, Register, Profile} from './Components'
+import {getGamesByUser} from './apiCalls/index';
 
 function App() {
   const [token, setToken] = useState('');
@@ -23,6 +24,12 @@ function App() {
 
       const storedUsername = localStorage.getItem('username');
       if(storedUsername) setUsername(storedUsername);
+
+      // if(token) {
+      //   const games = await getGamesByUser(token);
+      //   if(games) setMyGames(games);
+        
+      // }
 
 
     }
@@ -52,11 +59,11 @@ function App() {
     </div>
     <Routes>
       <Route path = '/' element = {<Home token = {token}/>}></Route>
-      <Route path = '/renju' element={<Renju />}></Route>
+      <Route path = '/renju/:gameId' element={<Renju token = {token}/>}></Route>
       <Route path = '/renjuform' element = {<RenjuForm token = {token}/>}></Route>
       <Route path = '/login' element = {<Login setToken = {setToken}/>}></Route>
       <Route path = '/register' element = {<Register setToken = {setToken}/>}></Route>
-      <Route path = '/profile' element = {<Profile username = {username} token = {token}/>}></Route>
+      <Route path = '/profile' element = {<Profile username = {username} token = {token} />}></Route>
     </Routes>
   </Router>
 }

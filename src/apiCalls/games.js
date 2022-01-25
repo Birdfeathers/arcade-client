@@ -28,7 +28,7 @@ export async function newGame(token, rows, cols, toWin, against, goesFirst) {
 export async function getGame(id)
 {
     try {
-        const response = await fetch(BaseUrl + 'games/game/'+ {id}, {
+        const response = await fetch(BaseUrl + 'games/game/'+ id, {
             headers: {
                 'Content-Type': 'application/json',
             }
