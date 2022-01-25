@@ -139,7 +139,9 @@ td {
   .most{
       height: 80%;
       width: 80%;
-      margin: 0 auto;
+      position:absolute;
+      margin-left: 3%;
+      margin-top: -45%;
   }
   
   .redBorder{
