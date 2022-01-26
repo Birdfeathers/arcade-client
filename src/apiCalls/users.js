@@ -1,4 +1,4 @@
-const {BaseUrl} = require('./constants');
+const {BaseUrl} = require('../constants');
 
 export async function login(username, password) {
     try {

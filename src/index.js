@@ -59,7 +59,7 @@ function App() {
     </div>
     <Routes>
       <Route path = '/' element = {<Home token = {token}/>}></Route>
-      <Route path = '/renju/:gameId' element={<Renju token = {token}/>}></Route>
+      <Route path = '/renju/:gameId' element={<Renju token = {token} username = {username} />}></Route>
       <Route path = '/renjuform' element = {<RenjuForm token = {token}/>}></Route>
       <Route path = '/login' element = {<Login setToken = {setToken}/>}></Route>
       <Route path = '/register' element = {<Register setToken = {setToken}/>}></Route>

@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ReactDOM from 'react-dom';
-import socketIOClient from "socket.io-client";
-const ENDPOINT = "http://127.0.0.1:4001";
-import {login, register} from '../apiCalls/index';
+import {login} from '../apiCalls/index';
 import { useNavigate } from "react-router-dom";
 
 function Login({setToken})

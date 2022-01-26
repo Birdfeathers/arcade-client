@@ -1,4 +1,4 @@
-const {BaseUrl} = require('./constants');
+const {BaseUrl} = require('../constants');
 
 export async function newGame(token, rows, cols, toWin, against, goesFirst) {
     try {

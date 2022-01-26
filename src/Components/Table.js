@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import {updateMoveHistory} from '../apiCalls/index';
+import { useParams } from 'react-router-dom';
+import socketIOClient from "socket.io-client";
+import { BaseUrl as ENDPOINT } from "../constants";
 
 function Cross({rowNum, colNum, rows, cols})
 {         let topLeft = "fourth", bottomLeft = "fourth", topRight = "fourth", bottomRight = "fourth";
@@ -50,8 +54,11 @@ function returnBorders(rowNum, colNum, rows)
 
 
 
-function Table({style, board, setMoveHistory, moveHistory, setTempTurnNum, setTurnNum})
+function Table({token, style, board, moveHistory, isTurn})
 {
+    const {gameId} = useParams();
+    const socket = socketIOClient(ENDPOINT);
+   
     
     return<table cellSpacing = {0} cellPadding = {0}><tbody>
             {board.map((row, indx) => {
@@ -59,14 +66,16 @@ function Table({style, board, setMoveHistory, moveHistory, setTempTurnNum, setTu
                     {row.map((cell, indx2) =>{
                         let classes = "";
                         if(style == "x") classes = returnBorders(indx, indx2, board.length);
-                        return<td key = {indx2} className = {classes} onClick = {() => {
-                            if(cell.occupied) return;
+                        return<td key = {indx2} className = {classes} onClick = {async () => {
+                            if(cell.occupied || !isTurn) return;
                             let history = moveHistory;
-                            history.push({row: indx, col: indx2})
+                            history.push({row: indx, col: indx2});
                             console.log(moveHistory);
-                            setMoveHistory(history);
-                            setTempTurnNum(history.length + 1);
-                            setTurnNum(history.length + 1)
+                            const updated = await updateMoveHistory(token, gameId, JSON.stringify(history));
+                            if(updated.error) alert(updated.message);
+                            else{
+                                socket.emit('move', {game: gameId, history: history});
+                            }
                         }}>
                             {style == "go"?<div className = "full"> 
                                 <Cross rowNum = {indx} colNum = {indx2} rows = {board.length} cols = {row.length} />
