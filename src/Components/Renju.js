@@ -4,86 +4,98 @@ import socketIOClient from "socket.io-client";
 const ENDPOINT = "http://127.0.0.1:4001";
 import { useParams } from 'react-router-dom';
 import {getGame} from '../apiCalls/index';
+import {Table} from './Table'
 
-function Cross({rowNum, colNum, rows, cols})
-{         let topLeft = "fourth", bottomLeft = "fourth", topRight = "fourth", bottomRight = "fourth";
-         if(rowNum != 0) topRight += " borderLeft";
-         if(colNum != 0) topLeft += " borderBottom";
-         if(rowNum != rows-1) bottomRight += " borderLeft";
-         if(colNum != cols -1) topRight += " borderBottom";
-          return<div className = "tan">
-          <div className = "half">
-            <div className = {topLeft}></div>
-            <div className = {topRight}></div>
-        </div>
-        <div className = "half">
-            <div className = {bottomLeft}></div>
-            <div className = {bottomRight}></div>
-        </div>
-        </div>
+// function Cross({rowNum, colNum, rows, cols})
+// {         let topLeft = "fourth", bottomLeft = "fourth", topRight = "fourth", bottomRight = "fourth";
+//          if(rowNum != 0) topRight += " borderLeft";
+//          if(colNum != 0) topLeft += " borderBottom";
+//          if(rowNum != rows-1) bottomRight += " borderLeft";
+//          if(colNum != cols -1) topRight += " borderBottom";
+//           return<div className = "tan">
+//           <div className = "half">
+//             <div className = {topLeft}></div>
+//             <div className = {topRight}></div>
+//         </div>
+//         <div className = "half">
+//             <div className = {bottomLeft}></div>
+//             <div className = {bottomRight}></div>
+//         </div>
+//         </div>
 
-}
+// }
 
-function X()
-{
-    return<div className = "full rotate45">
-                <div className = "half">
-                    <div className = "fourth borderBottom"></div>
-                    <div className = "fourth borderLeft borderBottom"></div>
-                </div>
-                <div className = "half">
-                    <div className = "fourth"></div>
-                    <div className = "fourth borderLeft"></div>
-                </div>
-            </div>
-}
+// function X()
+// {
+//     return<div className = "full rotate45">
+//                 <div className = "half">
+//                     <div className = "fourth borderBottom"></div>
+//                     <div className = "fourth borderLeft borderBottom"></div>
+//                 </div>
+//                 <div className = "half">
+//                     <div className = "fourth"></div>
+//                     <div className = "fourth borderLeft"></div>
+//                 </div>
+//             </div>
+// }
 
-function AddX({type}){
-    return<div>
-        {type === "black"?  <X />: <div className = "circle most border"></div>}
-    </div>
-}
+// function AddX({type}){
+//     return<div>
+//         {type === "black"?  <X />: <div className = "circle most border"></div>}
+//     </div>
+// }
 
-function Edges({rowNum, colNum, rows, check})
-{
-    let classList = "";
-    if(rowNum != rows -1) classList += " borderBottom";
-    if(colNum != 0) classList += " borderLeft"
-    return <td className = {classList} > 
-        {check.occupied?<AddX type = {check.type}/> :null}
-    </td>
-}
+// function Edges({rowNum, colNum, rows, check})
+// {
+//     let classList = "";
+//     if(rowNum != rows -1) classList += " borderBottom";
+//     if(colNum != 0) classList += " borderLeft"
+//     return <td className = {classList} > 
+//         {check.occupied?<AddX type = {check.type}/> :null}
+//     </td>
+// }
 
-function Cell({style, rowNum, colNum, rows, cols, board})
-{
-    let check = board[rowNum][colNum];
-    return <>
-        {style === "go"? <td>
-            <Cross rowNum = {rowNum} colNum = {colNum} rows = {rows} cols = {cols}/>
-            {check.occupied? <div className = {"circle full top shine " + check.type}></div>:null}
-            </td>
-        :
-    <Edges rowNum = {rowNum} colNum = {colNum} rows = {rows} check = {check}></Edges>}</>
-}
-function Row({cols, rows, style, rowNum, board})
-{
-    let row = [];
-    for(let i = 0; i< cols; i++)
-    {
-        row.push(<Cell style = {style} key = {i} rowNum = {rowNum} colNum = {i} rows = {rows} cols = {cols} board = {board}/>)
-    }
-    return <tr>{row}</tr>
-}
+// function Cell({style, rowNum, colNum, rows, cols, board, setMoveHistory, moveHistory, setRState, setRun})
+// {
+//     let check = board[rowNum][colNum];
+//     return <>
+//         {style === "go"? <td onClick = {() => {
+//             console.log("clicked")
+//             //setRun(false);
+//             let history = moveHistory;
+//             history.push({row: rowNum, col: colNum});
+//             setMoveHistory(history);
+//             setRState(Math.random());
+//         }}>
+//             <Cross rowNum = {rowNum} colNum = {colNum} rows = {rows} cols = {cols}/>
+//             {check.occupied? <div className = {"circle full top shine " + check.type}></div>:null}
+//             </td>
+//         :
+//     <Edges rowNum = {rowNum} colNum = {colNum} rows = {rows} check = {check}></Edges>}</>
+// }
+// function Row({cols, rows, style, rowNum, board, setMoveHistory, moveHistory, setTstate, setRun})
+// {
+//     let row = [];
+//     const [rState, setRState] = useState("");
+//     useEffect(() => {setTstate(Math.random())}, [rState])
+//     for(let i = 0; i< cols; i++)
+//     {
+//         row.push(<Cell style = {style} key = {i} rowNum = {rowNum} colNum = {i} rows = {rows} cols = {cols} board = {board} setMoveHistory = {setMoveHistory} moveHistory = {moveHistory} setRState = {setRState} setRun = {setRun}/>)
+//     }
+//     return <tr>{row}</tr>
+// }
 
-function Table({rows, cols, style, board})
-{
-    let table = [];
-    for(let i = 0; i< rows; i++)
-    {
-        table.push(<Row rows = {rows} cols = {cols} style = {style} rowNum = {i} board = {board} key = {i}/>)
-    }
-    return <table cellSpacing = {0} cellPadding = {0}><tbody>{table}</tbody></table>
-}
+// function Table({rows, cols, style, board, setMoveHistory, moveHistory, setAState, setRun})
+// {
+//     const [tState, setTstate] = useState("");
+//     useEffect(() => {setAState(Math.random())}, [tState])
+//     let table = [];
+//     for(let i = 0; i< rows; i++)
+//     {
+//         table.push(<Row rows = {rows} cols = {cols} style = {style} rowNum = {i} board = {board} key = {i} setMoveHistory = {setMoveHistory} moveHistory = {moveHistory} setTstate = {setTstate} setRun = {setRun}/>)
+//     }
+//     return <table cellSpacing = {0} cellPadding = {0}><tbody>{table}</tbody></table>
+// }
 
 function createBlankArray(rows, cols){
     let arr = [];
@@ -118,11 +130,14 @@ function Renju({token})
     const [moveHistory, setMoveHistory] = useState([]);
     const [style, setStyle] = useState("go");
     const [board, setBoard] = useState("");
-    const [run, setRun] = useState(false);
+    const [run, setRun] = useState(0);
     const [isCurrent, setIsCurrent] = useState(true);
     const [turnNum, setTurnNum] = useState(0);
     const [tempTurnNum, setTempTurnNum] = useState(0);
     const [turnPlayer, setTurnPlayer] = useState("");
+    const [aState, setAState] = useState(1);
+
+    useEffect(() => {console.log("aState", aState)}, [aState])
   
     useEffect(() => {
         const fetchData = async () => {
@@ -158,6 +173,7 @@ function Renju({token})
         if(tempTurnNum % 2 == 1) setTurnPlayer({username: game.playeroneusername, color: "black"});
         else setTurnPlayer({username: game.playertwousername, color: "white"});
         setRun(true);
+        console.log("hishere", moveHistory)
          
      },[tempTurnNum, moveHistory])
     
@@ -183,7 +199,7 @@ function Renju({token})
                 <button name = "backbutton" disabled = {tempTurnNum == 1} onClick = {() => {setTempTurnNum(tempTurnNum -1)}}>&#x2190;</button>
                 <button name = "forwardbutton" disabled = {tempTurnNum === turnNum} onClick = {() => {setTempTurnNum(tempTurnNum +1)}}>&#x2192;</button>
                </div>}
-       {board && run? <Table rows = {game.rows} cols = {game.cols} style = {style} board = {board} key = {board}/>:null}
+       {board && aState? <Table style = {style} board = {board} setMoveHistory = {setMoveHistory} moveHistory = {moveHistory} setTempTurnNum = {setTempTurnNum} setTurnNum = {setTurnNum}/>:null}
     </div>
 }
 
