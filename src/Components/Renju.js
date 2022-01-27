@@ -44,6 +44,7 @@ function Renju({token, username})
     const [turnNum, setTurnNum] = useState(0);
     const [tempTurnNum, setTempTurnNum] = useState(0);
     const [turnPlayer, setTurnPlayer] = useState("");
+    const [socket, setSocket] = useState(null);
 
     useEffect(() => {
         const socket = socketIOClient(ENDPOINT,{ transports : ['websocket'] });
@@ -52,7 +53,9 @@ function Renju({token, username})
             setTempTurnNum(move.history.length + 1);
             setTurnNum(move.history.length + 1)
         })
-    })
+        setSocket(socket);
+        return () => socket.disconnect();
+    }, [setSocket])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -112,7 +115,7 @@ function Renju({token, username})
                 <button name = "backbutton" disabled = {tempTurnNum == 1} onClick = {() => {setTempTurnNum(tempTurnNum -1)}}>&#x2190;</button>
                 <button name = "forwardbutton" disabled = {tempTurnNum === turnNum} onClick = {() => {setTempTurnNum(tempTurnNum +1)}}>&#x2192;</button>
                </div>}
-       {board? <Table token = {token} style = {style} board = {board} moveHistory = {moveHistory} isTurn = {username === turnPlayer.username} username = {username} setMoveHistory = {setMoveHistory}  setTempTurnNum = {setTempTurnNum} setTurnNum = {setTurnNum}/>:null}
+       {board? <Table token = {token} style = {style} board = {board} moveHistory = {moveHistory} isTurn = {username === turnPlayer.username} username = {username} setMoveHistory = {setMoveHistory}  setTempTurnNum = {setTempTurnNum} setTurnNum = {setTurnNum} socket = {socket}/>:null}
     </div>
 }
 

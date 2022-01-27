@@ -54,12 +54,11 @@ function returnBorders(rowNum, colNum, rows)
 
 
 
-function Table({token, style, board, moveHistory, isTurn, setMoveHistory, setTempTurnNum, setTurnNum})
+function Table({token, style, board, moveHistory, isTurn, setMoveHistory, setTempTurnNum, setTurnNum, socket})
 {
     const {gameId} = useParams();
-    const socket = socketIOClient(ENDPOINT);
-   
-    
+    // const socket = socketIOClient(ENDPOINT);
+ 
     return<table cellSpacing = {0} cellPadding = {0}><tbody>
             {board.map((row, indx) => {
                 return<tr key = {indx}>
