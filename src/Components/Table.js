@@ -54,7 +54,7 @@ function returnBorders(rowNum, colNum, rows)
 
 
 
-function Table({token, style, board, moveHistory, isTurn})
+function Table({token, style, board, moveHistory, isTurn, setMoveHistory, setTempTurnNum, setTurnNum})
 {
     const {gameId} = useParams();
     const socket = socketIOClient(ENDPOINT);
@@ -75,6 +75,9 @@ function Table({token, style, board, moveHistory, isTurn})
                             if(updated.error) alert(updated.message);
                             else{
                                 socket.emit('move', {game: gameId, history: history});
+                                setMoveHistory(history);
+                                setTurnNum(history.length + 1);
+                                setTempTurnNum(history.length + 1);
                             }
                         }}>
                             {style == "go"?<div className = "full"> 
