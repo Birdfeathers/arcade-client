@@ -53,7 +53,9 @@ function Renju({token, username})
         socket.on("game" + gameId, move => {
             setMoveHistory(move.history);
             setTempTurnNum(move.history.length + 1);
-            setTurnNum(move.history.length + 1)
+            setTurnNum(move.history.length + 1);
+            setWinLines(move.winLines);
+            setLineBoard(move.board);
         })
         setSocket(socket);
         return () => socket.disconnect();

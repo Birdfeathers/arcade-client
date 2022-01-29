@@ -103,12 +103,12 @@ function Table({token, style, board, moveHistory, isTurn, setMoveHistory, setTem
                             if(updated.error) alert(updated.message);
                             else{
                                 console.log(updated);
-                                socket.emit('move', {game: gameId, history: history});
-                                setMoveHistory(history);
-                                setTurnNum(history.length + 1);
-                                setTempTurnNum(history.length + 1);
-                                setWinLines(updated.winLines);
-                                setLineBoard(updated.board);
+                                socket.emit('move', {game: gameId, history: history, winLines: updated.winLines, board: updated.board});
+                                // setMoveHistory(history);
+                                // setTurnNum(history.length + 1);
+                                // setTempTurnNum(history.length + 1);
+                                // setWinLines(updated.winLines);
+                                // setLineBoard(updated.board);
                             }
                         }}>
                             {style == "go"?<div className = "full"> 
