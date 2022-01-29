@@ -58,7 +58,7 @@ export async function getGamesByUser(token)
     }
 }
 
-export async function updateMoveHistory(token, id, moveHistory)
+export async function updateMoveHistory(token, id, moveHistory, game)
 {
     try{
         const response = await fetch(BaseUrl + 'games/move', {
@@ -69,7 +69,33 @@ export async function updateMoveHistory(token, id, moveHistory)
             },
             body : JSON.stringify({
                 id,
-                moveHistory
+                moveHistory,
+                game
+            })
+        });
+        const result = await response.json();
+
+        console.log(result);
+        return result;
+
+    } catch(error) {
+        throw error;
+    }
+}
+
+export async function getWinLines(moveHistory, rows, cols, towin)
+{
+    try{
+        const response = await fetch(BaseUrl + 'games/winLines', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body : JSON.stringify({
+                moveHistory,
+                rows,
+                cols,
+                towin
             })
         });
         const result = await response.json();

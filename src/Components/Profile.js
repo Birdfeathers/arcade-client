@@ -33,6 +33,7 @@ function MyGames({token})
 {
     let navigate = useNavigate();
     const [games, setGames] = useState([]);
+    const [mode, setMode] = useState("active");
     useEffect(() => {
         const fetchData = async () => {
           console.log('useEffect running');
@@ -43,12 +44,17 @@ function MyGames({token})
         fetchData();
       }, [token]);
       return<>
-        <h3>Active Games:</h3>
-        { games.filter(game => !game.winner).map((game) => {
+        <h3>Games:</h3>
+        <select value = {mode} onChange = {(event) => {setMode(event.target.value)}}>
+            <option value = "active">Active</option>
+            <option value = "complete">Complete</option>
+        </select>
+        { games.filter(game => {if(mode == "active") return !game.winner; else return game.winner;}).map((game) => {
         return<div key = {game.id} className = "border" onClick = {(event) => {
             navigate(`../renju/${game.id}`);
         }}> 
             <h5>Game</h5>
+            {mode == "complete"? <p>winner: {game.winner}</p>:null}
             <p>Started by: {game.ownerusername} | First Player: {game.playeroneusername} | Second Player: {game.playertwousername}</p>
             <p>Rows: {game.rows} Columns: {game.cols} | {game.towin} needed to win</p>
         </div>})}
