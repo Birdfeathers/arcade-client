@@ -96,11 +96,18 @@ function Table({token, style, board, moveHistory, isTurn, setMoveHistory, setTem
                         if(style == "go" && inWin.length != 0) circleClasses += " winBorder"
                         return<td key = {indx2} className = {classes} onClick = {async () => {
                             if(cell.occupied || !isTurn) return;
+                            cell.occupied = true;
+                            if(moveHistory.length % 2) cell.type = "black";
+                            else cell.type = "white";
                             let history = moveHistory;
                             history.push({row: indx, col: indx2});
                             console.log("moveHistory", moveHistory, "board", board);
                             const updated = await updateMoveHistory(token, gameId, history, game);
-                            if(updated.error) alert(updated.message);
+                            if(updated.error) {
+                                cell.occupied = false;
+                                cell.type = "none";
+                                alert(updated.message);
+                            }
                             else{
                                 console.log(updated);
                                 socket.emit('move', {game: gameId, history: history, winLines: updated.winLines, board: updated.board});

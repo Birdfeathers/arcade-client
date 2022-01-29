@@ -1,7 +1,7 @@
-import e from "cors";
 import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import {getAllUsers, newGame} from '../apiCalls/index';
+import { useNavigate } from "react-router-dom";
 
 function RenjuForm({token})
 {
@@ -11,6 +11,7 @@ function RenjuForm({token})
     const [toWin, setToWin] = useState(3);
     const [against, setAgainst] = useState(1);
     const [order, setOrder] = useState('shuffle');
+    let navigate = useNavigate();
     useEffect(() => {
         const fetchData = async () => {
           console.log('useEffect running')
@@ -40,6 +41,7 @@ function RenjuForm({token})
                 const game = await newGame(token, rows, cols, toWin, against, goesFirst);
                 if(game.error) alert(game.message);
                 console.log(game);
+                navigate(`../renju/${game.id}`);
             }
 
        }}>

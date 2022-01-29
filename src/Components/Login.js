@@ -19,7 +19,7 @@ function Login({setToken})
                 localStorage.setItem('token', result.token);
                 localStorage.setItem('username', result.username);
                 setToken(result.token);
-                navigate("../");
+                navigate("../profile");
               
                 
             }
@@ -28,7 +28,7 @@ function Login({setToken})
             onChange={(event) => {
                 setUserName(event.target.value);
                     }}/>
-            <input type = "text" placeholder = "password" value={password}
+            <input type = "password" placeholder = "password" value={password}
              onChange={(event) => {
                 setPassword(event.target.value);
             }}/>

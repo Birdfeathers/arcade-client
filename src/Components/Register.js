@@ -28,11 +28,11 @@ function Register({setToken})
             onChange={(event) => {
                 setUserName(event.target.value);
                     }}/>
-            <input type = "text" placeholder = "password" value={password}
+            <input type = "password" placeholder = "password" value={password}
              onChange={(event) => {
                 setPassword(event.target.value);
             }}/>
-            <input type = "text" placeholder = "confirm password" value={confirmPassword}
+            <input type = "password" placeholder = "confirm password" value={confirmPassword}
              onChange={(event) => {
                 setConfirmPassword(event.target.value);
             }}/>

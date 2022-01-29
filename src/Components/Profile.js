@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {login, updatePassword, getGamesByUser} from '../apiCalls/index';
+import {login, updatePassword, getGamesByUser, updateMoveHistory} from '../apiCalls/index';
 import { useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 function ChangeUserPassword({username, token, setPasswordOpen})
 {
@@ -19,10 +20,10 @@ function ChangeUserPassword({username, token, setPasswordOpen})
             setPasswordOpen(false);
         }
         }}>
-        <input type = "text" placeholder = "old password" value = {oldPassword} onChange = {(event) => {
+        <input type = "password" placeholder = "old password" value = {oldPassword} onChange = {(event) => {
             setOldPassword(event.target.value);
         }}/>
-        <input type = "text" placeholder = "new password" value = {newPassword} onChange = {(event) => {
+        <input type = "password" placeholder = "new password" value = {newPassword} onChange = {(event) => {
             setNewPassword(event.target.value);
         }}/>
         <input type = "submit"/>
@@ -50,11 +51,21 @@ function MyGames({token})
             <option value = "complete">Complete</option>
         </select>
         { games.filter(game => {if(mode == "active") return !game.winner; else return game.winner;}).map((game) => {
+            let winner;
+            if(game.winner == "black") winner = game.playeroneusername;
+            else winner = game.playertwousername;
+            let turn = 1;
+            let turnPlayer = game.playeroneusername
+            if(game.movehistory){
+                turn = JSON.parse(game.movehistory).length + 1;
+                if(turn % 2) turnPlayer = game.playeroneusername;
+                else turnPlayer = game.playertwousername;
+            }
         return<div key = {game.id} className = "border" onClick = {(event) => {
             navigate(`../renju/${game.id}`);
         }}> 
-            <h5>Game</h5>
-            {mode == "complete"? <p>winner: {game.winner}</p>:null}
+            <h4>Game</h4>
+            {mode == "complete"? <p>winner: {winner}</p>:<p>{turnPlayer}'s turn</p>}
             <p>Started by: {game.ownerusername} | First Player: {game.playeroneusername} | Second Player: {game.playertwousername}</p>
             <p>Rows: {game.rows} Columns: {game.cols} | {game.towin} needed to win</p>
         </div>})}
@@ -71,6 +82,7 @@ function Profile({username, token})
             setPasswordOpen(!passwordOpen);
         }}> Change password</button>
         {passwordOpen? <ChangeUserPassword token = {token} username = {username} setPasswordOpen = {setPasswordOpen}/>: null}
+        {token? <Link to = '/renjuform'><button>Create New Tic-Tac-Toe/Renju Game</button></Link>: null}
         <MyGames token = {token} />
 
     </div>

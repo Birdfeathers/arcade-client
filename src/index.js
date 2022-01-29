@@ -4,19 +4,13 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import socketIOClient from "socket.io-client";
 import { BaseUrl as ENDPOINT } from "./constants";
 import {Renju, RenjuForm, Home, Login, Register, Profile} from './Components'
-import {getGamesByUser} from './apiCalls/index';
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [token, setToken] = useState('');
   const [username, setUsername] = useState('');
-  const [userId, setUserId] = useState('');
 
   useEffect(() => {
-    // const socket = socketIOClient(ENDPOINT);
-    // socket.on("FromAPI", data => {
-    //   setResponse(data);
-    // });
-
     const fetchData = async () => {
       console.log('useEffect running')
       const storedToken = localStorage.getItem('token');
@@ -24,13 +18,6 @@ function App() {
 
       const storedUsername = localStorage.getItem('username');
       if(storedUsername) setUsername(storedUsername);
-
-      // if(token) {
-      //   const games = await getGamesByUser(token);
-      //   if(games) setMyGames(games);
-        
-      // }
-
 
     }
     fetchData();
@@ -45,10 +32,12 @@ function App() {
         <Link to = '/' onClick = {() => {
           if(window.confirm('Are you sure you want to log out?'))
           {
+            //let navigate = useNavigate();
             setToken('');
             setUsername('');
             localStorage.removeItem('token');
             localStorage.removeItem('username');
+            //navigate("../login");
           } }}> Logout</Link>
         </>: <>
           <Link to = '/login'>Login</Link>
