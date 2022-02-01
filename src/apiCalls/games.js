@@ -58,8 +58,10 @@ export async function getGamesByUser(token)
     }
 }
 
-export async function updateMoveHistory(token, id, moveHistory, game)
+export async function updateMoveHistory(token, moveHistory, game)
 {
+    //console.log("update logs", token, gameId, history, game)
+    const id = game.id;
     try{
         const response = await fetch(BaseUrl + 'games/move', {
             method: "PATCH",

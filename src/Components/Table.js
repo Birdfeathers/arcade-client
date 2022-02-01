@@ -102,7 +102,8 @@ function Table({token, style, board, moveHistory, isTurn, setMoveHistory, setTem
                             let history = moveHistory;
                             history.push({row: indx, col: indx2});
                             console.log("moveHistory", moveHistory, "board", board);
-                            const updated = await updateMoveHistory(token, gameId, history, game);
+                            console.log(game);
+                            const updated = await updateMoveHistory(token, history, game);
                             if(updated.error) {
                                 cell.occupied = false;
                                 cell.color = "none";
