@@ -51,6 +51,7 @@ function Renju({token, username})
     useEffect(() => {
         const socket = socketIOClient(ENDPOINT,{ transports : ['websocket'] });
         socket.on("game" + gameId, move => {
+            console.log("newmH", move.history);
             setMoveHistory(move.history);
             setTempTurnNum(move.history.length + 1);
             setTurnNum(move.history.length + 1);
