@@ -14,7 +14,7 @@ function createBlankArray(rows, cols){
         let r = [];
         for(let j = 0; j < cols; j++)
         {
-            r.push({occupied:false, type: "none"})
+            r.push({occupied:false, color: "none"})
         }
         arr.push(r);
     }
@@ -28,7 +28,7 @@ function createFilledArray(rows, cols, history)
         let turn;
         if(indx % 2 == 0) turn = "black";
         else turn = "white";
-        arr1[move.row][move.col] = {occupied:true, type: turn, moveNum: indx + 1};
+        arr1[move.row][move.col] = {occupied:true, color: turn, moveNum: indx + 1};
     });
     return arr1;
 }
