@@ -79,7 +79,7 @@ function Renju({token, username})
         if(usedHistory.length % 2 == 0) setTurnPlayer({username: game.playeroneusername, color: "black"});
         else setTurnPlayer({username: game.playertwousername, color: "white"});
 
-     }, [game, usedHistory, moveHistory])
+     }, [game, usedHistory])
 
 
 
