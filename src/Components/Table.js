@@ -3,6 +3,7 @@ import {updateMoveHistory} from '../apiCalls/index';
 import { useParams } from 'react-router-dom';
 import socketIOClient from "socket.io-client";
 import { BaseUrl as ENDPOINT } from "../constants";
+import {getGame, getWinLines} from '../apiCalls/index';
 
 function Cross({rowNum, colNum, rows, cols})
 {         let topLeft = "fourth", bottomLeft = "fourth", topRight = "fourth", bottomRight = "fourth";
@@ -37,9 +38,11 @@ function Line({direction})
     
 }
 
-function X()
+function X({future})
 {
-    return<div className = "full rotate45">
+    let classes = "full rotate45";
+    if(future) classes += " translucent"
+    return<div className = {classes}>
                 <div className = "half">
                     <div className = "fourth borderBottom"></div>
                     <div className = "fourth borderLeft borderBottom"></div>
@@ -51,9 +54,11 @@ function X()
             </div>
 }
 
-function AddX({color}){
+function AddX({color, future}){
+    let classes = "circle most border";
+    if(future) classes += " translucent"
     return<div>
-        {color === "black"?  <X />: <div className = "circle most border"></div>}
+        {color === "black"?  <X future = {future}/>: <div className = {classes}></div>}
     </div>
 }
 
@@ -65,6 +70,8 @@ function returnBorders(rowNum, colNum, rows)
     if(colNum != 0) classList += " borderLeft"
     return classList;
 }
+
+
 
 function isInWin(lineBoard, winLines, row, col)
 {
@@ -80,50 +87,74 @@ function isInWin(lineBoard, winLines, row, col)
 }
 
 
-function Table({token, style, board, moveHistory, isTurn, setMoveHistory, setTempTurnNum, setTurnNum, socket, game, setWinLines, winLines, lineBoard, setLineBoard})
+function Table({token,
+                style, 
+                moveHistory, 
+                isTurn,  
+                socket, 
+                game, 
+                winLines, 
+                lineBoard, 
+                isCurrent,
+                future, 
+                futureMoves,
+                setFutureMoves,
+                tempTurnNum, 
+                setTurnPlayer, 
+                setUsedHistory,
+                futureTurnNum,
+                setFutureTurnNum
+            })
 {
     const {gameId} = useParams();
-    console.log(lineBoard);
  
     return<table cellSpacing = {0} cellPadding = {0}><tbody>
-            {board.map((row, indx) => {
+            {lineBoard.map((row, indx) => {
                 return<tr key = {indx}>
                     {row.map((cell, indx2) =>{
                         let classes = "";
                         let circleClasses = "circle full top shine " + cell.color;
-                        if(style == "x") classes = returnBorders(indx, indx2, board.length);
+                        if(cell.future) circleClasses += " translucent";
+                        if(style == "x") classes = returnBorders(indx, indx2, lineBoard.length);
                         const inWin = isInWin(lineBoard, winLines, indx, indx2);
                         if(style == "go" && inWin.length != 0) circleClasses += " winBorder"
                         return<td key = {indx2} className = {classes} onClick = {async () => {
-                            if(cell.occupied || !isTurn) return;
-                            cell.occupied = true;
-                            if(moveHistory.length % 2) cell.color = "black";
-                            else cell.color = "white";
-                            let history = moveHistory;
-                            history.push({row: indx, col: indx2});
-                            console.log("moveHistory", moveHistory, "board", board);
-                            console.log(game);
-                            const updated = await updateMoveHistory(token, history, game);
-                            if(updated.error) {
-                                cell.occupied = false;
-                                cell.color = "none";
-                                alert(updated.message);
-                            }
-                            else{
-                                console.log(updated);
-                                socket.emit('move', {game: gameId, history: history, winLines: updated.winLines, board: updated.board});
-                                // setMoveHistory(history);
-                                // setTurnNum(history.length + 1);
-                                // setTempTurnNum(history.length + 1);
-                                // setWinLines(updated.winLines);
-                                // setLineBoard(updated.board);
+                            if(cell.occupied) return;
+                            if(future)
+                            {
+                                let fm = futureMoves.slice(0, futureTurnNum);
+                                fm.push({row: indx, col: indx2, future: true});
+                                setFutureMoves(fm);
+                                setUsedHistory(moveHistory.slice(0, tempTurnNum -1).concat(fm));
+                                setFutureTurnNum(fm.length);
+                                let turn;
+                                if((tempTurnNum + fm.length) % 2) turn = "Black"
+                                else turn = "White"
+                                setTurnPlayer({color: turn, username: turn});
+                                
+                            } else {
+                                if(!isTurn|| !isCurrent) return;
+                                cell.occupied = true;
+                                if(moveHistory.length % 2) cell.color = "black";
+                                else cell.color = "white";
+                                let history = moveHistory;
+                                history.push({row: indx, col: indx2});
+                                const updated = await updateMoveHistory(token, history, game);
+                                if(updated.error) {
+                                    cell.occupied = false;
+                                    cell.color = "none";
+                                    alert(updated.message);
+                                }
+                                else{
+                                    socket.emit('move', {game: gameId, history: history, winLines: updated.winLines, board: updated.board});
+                                }
                             }
                         }}>
                             {style == "go"?<div className = "full"> 
-                                <Cross rowNum = {indx} colNum = {indx2} rows = {board.length} cols = {row.length} />
+                                <Cross rowNum = {indx} colNum = {indx2} rows = {lineBoard.length} cols = {row.length} />
                                 {cell.occupied? <div className = {circleClasses}></div>:null}
                             </div>:<div className = "full">
-                            {cell.occupied?<AddX color = {cell.color}/> :null}
+                            {cell.occupied?<AddX color = {cell.color} future = {cell.future}/> :null}
                             {inWin.includes("horizontal")? <Line direction = "horizontal" />:null}
                             {inWin.includes("vertical")? <Line direction = "vertical" />:null}
                             {inWin.includes("positive")? <Line direction = "positive" />:null}

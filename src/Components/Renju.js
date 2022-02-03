@@ -7,31 +7,8 @@ import {getGame, getWinLines} from '../apiCalls/index';
 import {Table} from './Table'
 
 
-function createBlankArray(rows, cols){
-    let arr = [];
-    for(let i = 0; i < rows; i++)
-    {
-        let r = [];
-        for(let j = 0; j < cols; j++)
-        {
-            r.push({occupied:false, color: "none"})
-        }
-        arr.push(r);
-    }
-    return arr;
-}
 
-function createFilledArray(rows, cols, history)
-{
-    let arr1 = createBlankArray(rows, cols);
-    history.forEach((move, indx) => {
-        let turn;
-        if(indx % 2 == 0) turn = "black";
-        else turn = "white";
-        arr1[move.row][move.col] = {occupied:true, color: turn, moveNum: indx + 1};
-    });
-    return arr1;
-}
+
 
 function Renju({token, username})
 {
@@ -39,7 +16,6 @@ function Renju({token, username})
     const [game, setGame] = useState(null);
     const [moveHistory, setMoveHistory] = useState([]);
     const [style, setStyle] = useState("go");
-    const [board, setBoard] = useState("");
     const [isCurrent, setIsCurrent] = useState(true);
     const [turnNum, setTurnNum] = useState(0);
     const [tempTurnNum, setTempTurnNum] = useState(0);
@@ -47,11 +23,15 @@ function Renju({token, username})
     const [socket, setSocket] = useState(null);
     const [winLines, setWinLines] = useState([]);
     const [lineBoard, setLineBoard] = useState([]);
+    const [future, setFuture] = useState(false);
+    const [futureMoves, setFutureMoves] = useState([]);
+    const [usedHistory, setUsedHistory] = useState([]);
+    const [futureTurnNum, setFutureTurnNum] = useState(0);
 
     useEffect(() => {
+        console.log('useEffect for setting socket running');
         const socket = socketIOClient(ENDPOINT,{ transports : ['websocket'] });
         socket.on("game" + gameId, move => {
-            console.log("newmH", move.history);
             setMoveHistory(move.history);
             setTempTurnNum(move.history.length + 1);
             setTurnNum(move.history.length + 1);
@@ -66,19 +46,13 @@ function Renju({token, username})
         const fetchData = async () => {
           console.log('useEffect for setting game running');
           if(!token) return;
-          console.log(gameId)
           const game = await getGame(gameId);
-          console.log("game", game)
           if(game){ 
             setGame(game);
             if(game.movehistory) {
                 const parsedHis = JSON.parse(game.movehistory);
-                console.log(parsedHis)
-                setMoveHistory(parsedHis)
-                const wins = await getWinLines(parsedHis,game.rows, game.cols, game.towin);
-                console.log(wins);
-                setWinLines(wins.winLines);
-                setLineBoard(wins.board);
+                setMoveHistory(parsedHis);
+                setUsedHistory(parsedHis);
             }
           }
     }
@@ -92,26 +66,26 @@ function Renju({token, username})
         setTempTurnNum(moveHistory.length + 1);
         if(moveHistory.length % 2 == 0) setTurnPlayer({username: game.playeroneusername, color: "black"});
         else setTurnPlayer({username: game.playertwousername, color: "white"});
-     }, [game, moveHistory, board.length])
+     }, [game, moveHistory, lineBoard.length])
 
-     useEffect(() => {
+     useEffect(async () => {
          if(!game) return;
-         console.log('useEffect for setting board running');
-        setBoard(createFilledArray(game.rows, game.cols, moveHistory.slice(0, tempTurnNum -1)));
-        if(tempTurnNum % 2 == 1) setTurnPlayer({username: game.playeroneusername, color: "black"});
-        else setTurnPlayer({username: game.playertwousername, color: "white"});
-         
-     },[tempTurnNum, moveHistory])
-    
+        const wins = await getWinLines(usedHistory,game.rows, game.cols, game.towin);
+        setWinLines(wins.winLines);
+        setLineBoard(wins.board);
+
+     }, [game, usedHistory, moveHistory])
+
+
 
     return<div>
        <h1>Renju</h1>
-       {winLines.length == 0 ? <div>{!game || tempTurnNum -1 !== game.rows * game.cols ?<h3>Turn {tempTurnNum} {turnPlayer.color}'s({turnPlayer.username}'s) move</h3>:
+       {winLines.length == 0 ? <div>{!game || tempTurnNum -1 !== game.rows * game.cols ?<h3>Turn {tempTurnNum + futureMoves.length} {turnPlayer.color}'s({turnPlayer.username}'s) move</h3>:
        <h3>Draw.</h3>}</div>:
        <div>{(winLines[0].color == "black" && game.playeroneusername == username) || (winLines[0].color == "white" && game.playertwousername == username)? <h3>Congratulations {username}, you win!!!</h3>:
        <h3>You Lose. Too Bad.</h3> }</div>}
        {!isCurrent && tempTurnNum === turnNum? <h3>(Current Board)</h3>: !isCurrent? <h3>
-        {turnNum - tempTurnNum} moves away from current Board.
+        {turnNum - tempTurnNum} move(s) before current Board.
        </h3>: null}
        <label>Board style: </label>
        <select value = {style} onChange = {(event) =>{setStyle(event.target.value)}}>
@@ -119,29 +93,64 @@ function Renju({token, username})
            <option value = "x"> Tic-Tac-Toe </option>
        </select>
        <br />
-       <label>View Past Board States</label>
+       <label>View Past/Future Board States</label>
        <input type = "checkbox" checked = {!isCurrent} onChange = {
            async event => {setIsCurrent(!event.target.checked)
-            const wins = await getWinLines(moveHistory,game.rows, game.cols, game.towin);
-            setWinLines(wins.winLines);
-            setLineBoard(wins.board);
-           setTempTurnNum(turnNum);
+            setUsedHistory(moveHistory);
+            setTempTurnNum(turnNum);
+            setFuture(false);
+            setFutureMoves([]);
        }} />
        {isCurrent? null: <div> 
-                <button name = "backbutton" disabled = {tempTurnNum == 1} onClick = {async () => {
-                    const wins = await getWinLines(moveHistory.slice(0, tempTurnNum -2),game.rows, game.cols, game.towin);
-                    setWinLines(wins.winLines);
-                    setLineBoard(wins.board);
+                <label>past moves: </label>
+                <button name = "backbutton" disabled = {tempTurnNum == 1 || future} onClick = {async () => {
+                    setUsedHistory(moveHistory.slice(0, tempTurnNum - 2));
                     setTempTurnNum(tempTurnNum -1);
                     }}>&#x2190;</button>
-                <button name = "forwardbutton" disabled = {tempTurnNum === turnNum} onClick = {async () => {
-                    const wins = await getWinLines(moveHistory.slice(0, tempTurnNum),game.rows, game.cols, game.towin);
-                    setWinLines(wins.winLines);
-                    setLineBoard(wins.board);
+                <button name = "forwardbutton" disabled = {tempTurnNum === turnNum || future} onClick = {async () => {
+                    setUsedHistory(moveHistory.slice(0, tempTurnNum));
                     setTempTurnNum(tempTurnNum +1);
                     }}>&#x2192;</button>
+                <br />
+                <label>See theoretical future moves</label>
+                <input type = "checkbox" checked = {future} onChange = { async(event) =>{
+                    setFutureMoves([]);
+                    setFuture(event.target.checked);
+                    setUsedHistory(moveHistory.slice(0, tempTurnNum -1))
+                }}></input> 
+                {future? <div>
+                    <label>future moves: </label>
+                    <button name = "futurebackbutton" disabled = {futureTurnNum == 0} onClick = { () => {
+                        setUsedHistory(moveHistory.slice(0, tempTurnNum -1).concat(futureMoves.slice(0, futureTurnNum -1 )));
+                        setFutureTurnNum(futureTurnNum - 1)
+                    }}>&#x2190;</button>
+                    <button name = "futureforawardbutton" disabled = {futureTurnNum >= futureMoves.length} onClick = { () => {
+                        setUsedHistory(moveHistory.slice(0, tempTurnNum -1).concat(futureMoves.slice(0, futureTurnNum + 1)));
+                        setFutureTurnNum(futureTurnNum + 1)
+                    }}>&#x2192;</button>
+                
+                </div>:null}
                </div>}
-       {board? <Table token = {token} style = {style} board = {board} moveHistory = {moveHistory} isTurn = {username === turnPlayer.username} username = {username} setMoveHistory = {setMoveHistory}  setTempTurnNum = {setTempTurnNum} setTurnNum = {setTurnNum} socket = {socket} game = {game} setWinLines = {setWinLines} winLines ={winLines} lineBoard = {lineBoard} setLineBoard = {setLineBoard}/>:null}
+       {lineBoard? <Table token = {token} 
+                                style = {style} 
+                                moveHistory = {moveHistory} 
+                                isTurn = {username === turnPlayer.username}  
+                                setTempTurnNum = {setTempTurnNum} 
+                                setTurnNum = {setTurnNum}
+                                socket = {socket} 
+                                game = {game} 
+                                winLines ={winLines} 
+                                lineBoard = {lineBoard} setLineBoard = {setLineBoard} 
+                                isCurrent = {isCurrent} 
+                                future = {future} 
+                                futureMoves = {futureMoves}
+                                setFutureMoves = {setFutureMoves}
+                                tempTurnNum = {tempTurnNum}
+                                setTurnPlayer = {setTurnPlayer} 
+                                setUsedHistory = {setUsedHistory}
+                                futureTurnNum = {futureTurnNum}
+                                setFutureTurnNum = {setFutureTurnNum}
+                                />:null}
     </div>
 }
 
