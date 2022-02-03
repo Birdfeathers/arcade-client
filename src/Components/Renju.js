@@ -35,13 +35,6 @@ function Renju({token, username})
         const socket = socketIOClient(ENDPOINT,{ transports : ['websocket'] });
         socket.on("game" + gameId, move => {
             setMoveHistory(move.history);
-            setTurnNum(move.history.length + 1);
-            if(isCurrent){
-                setUsedHistory(move.history);
-                setTempTurnNum(move.history.length + 1);
-            } else{
-                setOtherMoved(true);
-            }
         })
         setSocket(socket);
         return () => socket.disconnect();
@@ -58,7 +51,7 @@ function Renju({token, username})
                 const parsedHis = JSON.parse(game.movehistory);
                 setMoveHistory(parsedHis);
                 setUsedHistory(parsedHis);
-            }
+            } 
           }
     }
         fetchData();
@@ -68,11 +61,19 @@ function Renju({token, username})
          if(!game) return;
         console.log('useEffect for setting turn Number running')
         setTurnNum(moveHistory.length + 1);
-        setTempTurnNum(moveHistory.length + 1);
-     }, [game, moveHistory, lineBoard.length])
+        if(isCurrent){
+            setTempTurnNum(moveHistory.length + 1);
+            setUsedHistory(moveHistory);
+        }else{
+            setOtherMoved(true);
+        }
+     }, [game, lineBoard.length, moveHistory])
+
+
 
      useEffect(async () => {
          if(!game) return;
+         console.log('UseEffect for usedHistory running.')
         const wins = await getWinLines(usedHistory,game.rows, game.cols, game.towin);
         setWinLines(wins.winLines);
         setLineBoard(wins.board);
@@ -101,7 +102,8 @@ function Renju({token, username})
        <br />
        <label>View Past/Future Board States</label>
        <input type = "checkbox" checked = {!isCurrent} onChange = {
-           async event => {setIsCurrent(!event.target.checked)
+           async event => {
+            setIsCurrent(!event.target.checked)
             setUsedHistory(moveHistory);
             setTempTurnNum(turnNum);
             setFuture(false);
