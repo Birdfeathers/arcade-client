@@ -27,15 +27,21 @@ function Renju({token, username})
     const [futureMoves, setFutureMoves] = useState([]);
     const [usedHistory, setUsedHistory] = useState([]);
     const [futureTurnNum, setFutureTurnNum] = useState(0);
+    const [otherMoved, setOtherMoved] = useState(false);
+
 
     useEffect(() => {
         console.log('useEffect for setting socket running');
         const socket = socketIOClient(ENDPOINT,{ transports : ['websocket'] });
         socket.on("game" + gameId, move => {
             setMoveHistory(move.history);
-            setUsedHistory(move.history);
-            setTempTurnNum(move.history.length + 1);
             setTurnNum(move.history.length + 1);
+            if(isCurrent){
+                setUsedHistory(move.history);
+                setTempTurnNum(move.history.length + 1);
+            } else{
+                setOtherMoved(true);
+            }
         })
         setSocket(socket);
         return () => socket.disconnect();
@@ -63,8 +69,6 @@ function Renju({token, username})
         console.log('useEffect for setting turn Number running')
         setTurnNum(moveHistory.length + 1);
         setTempTurnNum(moveHistory.length + 1);
-        if(moveHistory.length % 2 == 0) setTurnPlayer({username: game.playeroneusername, color: "black"});
-        else setTurnPlayer({username: game.playertwousername, color: "white"});
      }, [game, moveHistory, lineBoard.length])
 
      useEffect(async () => {
@@ -72,6 +76,8 @@ function Renju({token, username})
         const wins = await getWinLines(usedHistory,game.rows, game.cols, game.towin);
         setWinLines(wins.winLines);
         setLineBoard(wins.board);
+        if(usedHistory.length % 2 == 0) setTurnPlayer({username: game.playeroneusername, color: "black"});
+        else setTurnPlayer({username: game.playertwousername, color: "white"});
 
      }, [game, usedHistory, moveHistory])
 
@@ -86,6 +92,7 @@ function Renju({token, username})
        {!isCurrent && tempTurnNum === turnNum? <h3>(Current Board)</h3>: !isCurrent? <h3>
         {turnNum - tempTurnNum} move(s) before current Board.
        </h3>: null}
+       {otherMoved? <p> The other player has moved since you entered past/future mode</p>:null}
        <label>Board style: </label>
        <select value = {style} onChange = {(event) =>{setStyle(event.target.value)}}>
            <option value = "go"> Go Board </option>
@@ -99,6 +106,7 @@ function Renju({token, username})
             setTempTurnNum(turnNum);
             setFuture(false);
             setFutureMoves([]);
+            setOtherMoved(false);
        }} />
        {isCurrent? null: <div> 
                 <label>past moves: </label>

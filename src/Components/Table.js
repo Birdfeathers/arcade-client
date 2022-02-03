@@ -127,10 +127,6 @@ function Table({token,
                                 setFutureMoves(fm);
                                 setUsedHistory(moveHistory.slice(0, tempTurnNum -1).concat(fm));
                                 setFutureTurnNum(fm.length);
-                                let turn;
-                                if((tempTurnNum + fm.length) % 2) turn = "Black"
-                                else turn = "White"
-                                setTurnPlayer({color: turn, username: turn});
                                 
                             } else {
                                 if(!isTurn|| !isCurrent) return;
