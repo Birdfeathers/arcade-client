@@ -33,10 +33,9 @@ function Renju({token, username})
         const socket = socketIOClient(ENDPOINT,{ transports : ['websocket'] });
         socket.on("game" + gameId, move => {
             setMoveHistory(move.history);
+            setUsedHistory(move.history);
             setTempTurnNum(move.history.length + 1);
             setTurnNum(move.history.length + 1);
-            setWinLines(move.winLines);
-            setLineBoard(move.board);
         })
         setSocket(socket);
         return () => socket.disconnect();
@@ -117,6 +116,7 @@ function Renju({token, username})
                     setFutureMoves([]);
                     setFuture(event.target.checked);
                     setUsedHistory(moveHistory.slice(0, tempTurnNum -1))
+                    setFutureTurnNum(0);
                 }}></input> 
                 {future? <div>
                     <label>future moves: </label>

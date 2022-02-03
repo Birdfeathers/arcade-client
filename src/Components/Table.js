@@ -134,9 +134,9 @@ function Table({token,
                                 
                             } else {
                                 if(!isTurn|| !isCurrent) return;
-                                cell.occupied = true;
-                                if(moveHistory.length % 2) cell.color = "black";
+                                if(!(moveHistory.length % 2)) cell.color = "black";
                                 else cell.color = "white";
+                                cell.occupied = true;
                                 let history = moveHistory;
                                 history.push({row: indx, col: indx2});
                                 const updated = await updateMoveHistory(token, history, game);
