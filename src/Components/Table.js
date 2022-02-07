@@ -142,6 +142,9 @@ function Table({token,
                                     alert(updated.message);
                                 }
                                 else{
+                                    console.log("moveHisotory: ", history);
+                                    const {threeThree, fourFour, overline} = updated.violations;
+                                    console.log("threeThree: " + threeThree + ", fourFour: " + fourFour + ", overline: " + overline);
                                     socket.emit('move', {game: gameId, history: history, winLines: updated.winLines, board: updated.board});
                                 }
                             }
