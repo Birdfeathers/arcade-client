@@ -1,6 +1,6 @@
 const {BaseUrl} = require('../constants');
 
-export async function newGame(token, rows, cols, toWin, against, goesFirst) {
+export async function newGame(token, rows, cols, toWin, against, goesFirst, overline, threeThree, fourFour, giveWarning) {
     try {
         const response = await fetch(BaseUrl + 'games/newgame', {
             method: "POST",
@@ -14,7 +14,11 @@ export async function newGame(token, rows, cols, toWin, against, goesFirst) {
                 cols,
                 toWin,
                 against,
-                goesFirst
+                goesFirst,
+                overline,
+                threeThree,
+                fourFour,
+                giveWarning
             })
         });
         const result = await response.json();
@@ -98,6 +102,33 @@ export async function getWinLines(moveHistory, rows, cols, towin)
                 rows,
                 cols,
                 towin
+            })
+        });
+        const result = await response.json();
+
+        console.log(result);
+        return result;
+
+    } catch(error) {
+        throw error;
+    }
+}
+
+export async function getViolations(moveHistory, rows, cols, overline, threeThree, fourFour)
+{
+    try{
+        const response = await fetch(BaseUrl + 'games/violations', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body : JSON.stringify({
+                moveHistory,
+                rows,
+                cols,
+                overline,
+                threeThree,
+                fourFour
             })
         });
         const result = await response.json();

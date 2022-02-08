@@ -65,16 +65,18 @@ td {
 
   .wood{
       /* background-color: sandybrown; */
-      background-image: url('/images/wood.jpg');
+      /* background-image: url('/images/wood.jpg'); */
       box-shadow: 5px 10px 10px black;
-      background-repeat: no-repeat;
-      background-size: cover;
+      /* background-repeat: no-repeat;
+      background-size: cover; */
   }
 
   .tan{
       background-color: sandybrown;
       height: 100%;
   }
+  
+  
 
 .paper{
     background-image: url('/images/paper.jpg');
@@ -167,6 +169,13 @@ td {
       height: 95%;
       z-index: 15;
   }
+
+  .loseBorder{
+    border: 3px solid red;
+    width: 95%;
+    height: 95%;
+    z-index: 15;
+}
 
   .blackBorder{
       border: 3px solid black !important;

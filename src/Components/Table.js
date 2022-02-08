@@ -3,7 +3,7 @@ import {updateMoveHistory} from '../apiCalls/index';
 import { useParams } from 'react-router-dom';
 import socketIOClient from "socket.io-client";
 import { BaseUrl as ENDPOINT } from "../constants";
-import {getGame, getWinLines} from '../apiCalls/index';
+import {getGame, getWinLines, getViolations} from '../apiCalls/index';
 
 function Cross({rowNum, colNum, rows, cols})
 {         let topLeft = "fourth", bottomLeft = "fourth", topRight = "fourth", bottomRight = "fourth";
@@ -38,27 +38,30 @@ function Line({direction})
     
 }
 
-function X({future})
+function X({future, illegal})
 {
+    let innerClasses = "";
     let classes = "full rotate45";
-    if(future) classes += " translucent"
+    if(future) classes += " translucent";
+    if(illegal)innerClasses += " redBorder";
     return<div className = {classes}>
                 <div className = "half">
-                    <div className = "fourth borderBottom"></div>
-                    <div className = "fourth borderLeft borderBottom"></div>
+                    <div className = {"fourth borderBottom" + innerClasses}></div>
+                    <div className = {"fourth borderLeft borderBottom" + innerClasses}></div>
                 </div>
                 <div className = "half">
                     <div className = "fourth"></div>
-                    <div className = "fourth borderLeft"></div>
+                    <div className = {"fourth borderLeft" + innerClasses}></div>
                 </div>
             </div>
 }
 
-function AddX({color, future}){
+function AddX({color, future, illegal}){
     let classes = "circle most border";
-    if(future) classes += " translucent"
+    if(future) classes += " translucent";
+    if(illegal) classes += " redBorder"
     return<div>
-        {color === "black"?  <X future = {future}/>: <div className = {classes}></div>}
+        {color === "black"?  <X future = {future} illegal = {illegal}/>: <div className = {classes}></div>}
     </div>
 }
 
@@ -114,6 +117,7 @@ function Table({token,
                     {row.map((cell, indx2) =>{
                         let classes = "";
                         let circleClasses = "circle full top shine " + cell.color;
+                        if(cell.illegal) circleClasses += " loseBorder";
                         if(cell.future) circleClasses += " translucent";
                         if(style == "x") classes = returnBorders(indx, indx2, lineBoard.length);
                         const inWin = isInWin(lineBoard, winLines, indx, indx2);
@@ -135,25 +139,43 @@ function Table({token,
                                 cell.occupied = true;
                                 let history = moveHistory;
                                 history.push({row: indx, col: indx2});
-                                const updated = await updateMoveHistory(token, history, game);
-                                if(updated.error) {
+                                let cont = true;
+                                console.log(game, game.givewarning)
+                                if(game.givewarning && moveHistory.length % 2)
+                                {
+                                    console.log("in here");
+                                    const violations = await getViolations(history, game.rows, game.cols, game.overline, game.threeThree, game.fourFour);
+                                    console.log(violations);
+                                    if(violations.overline || violations.threeThree || violations.fourFour)
+                                    {
+                                        cont = confirm('This is an illegal move. Make move anyway?');
+                                        console.log(cont)
+                                        if(!cont) history.pop();
+                                    }
+                                }
+                                if(!cont){
                                     cell.occupied = false;
                                     cell.color = "none";
-                                    alert(updated.message);
-                                }
-                                else{
-                                    console.log("moveHisotory: ", history);
-                                    const {threeThree, fourFour, overline} = updated.violations;
-                                    console.log("threeThree: " + threeThree + ", fourFour: " + fourFour + ", overline: " + overline);
-                                    socket.emit('move', {game: gameId, history: history, winLines: updated.winLines, board: updated.board});
-                                }
+                                } else{
+                                    const updated = await updateMoveHistory(token, history, game);
+                                    if(updated.error) {
+                                        cell.occupied = false;
+                                        cell.color = "none";
+                                        alert(updated.message);
+                                    }
+                                    else{
+                                        console.log("moveHisotory: ", history);
+                                        const {threeThree, fourFour, overline} = updated.violations;
+                                        console.log("threeThree: " + threeThree + ", fourFour: " + fourFour + ", overline: " + overline);
+                                        socket.emit('move', {game: gameId, history: history, winLines: updated.winLines, board: updated.board});
+                                }}
                             }
                         }}>
                             {style == "go"?<div className = "full"> 
                                 <Cross rowNum = {indx} colNum = {indx2} rows = {lineBoard.length} cols = {row.length} />
                                 {cell.occupied? <div className = {circleClasses}></div>:null}
                             </div>:<div className = "full">
-                            {cell.occupied?<AddX color = {cell.color} future = {cell.future}/> :null}
+                            {cell.occupied?<AddX color = {cell.color} future = {cell.future} illegal = {cell.illegal}/> :null}
                             {inWin.includes("horizontal")? <Line direction = "horizontal" />:null}
                             {inWin.includes("vertical")? <Line direction = "vertical" />:null}
                             {inWin.includes("positive")? <Line direction = "positive" />:null}

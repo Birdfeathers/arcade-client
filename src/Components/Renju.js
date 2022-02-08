@@ -80,7 +80,7 @@ function Renju({token, username})
         if(usedHistory.length % 2 == 0) setTurnPlayer({username: game.playeroneusername, color: "black"});
         else setTurnPlayer({username: game.playertwousername, color: "white"});
 
-     }, [game, usedHistory])
+     }, [usedHistory])
 
 
 
@@ -88,7 +88,7 @@ function Renju({token, username})
        <h1>Renju</h1>
        {winLines.length == 0 ? <div>{!game || tempTurnNum -1 !== game.rows * game.cols ?<h3>Turn {tempTurnNum + futureMoves.length} {turnPlayer.color}'s({turnPlayer.username}'s) move</h3>:
        <h3>Draw.</h3>}</div>:
-       <div>{(winLines[0].color == "black" && game.playeroneusername == username) || (winLines[0].color == "white" && game.playertwousername == username)? <h3>Congratulations {username}, you win!!!</h3>:
+       <div>{(winLines[0].color == "black" && game.playeroneusername == username) || (winLines[0].color == "white" && game.playertwousername == username)? <h3>Congratulations {username}({winLines[0].color}), you win!!!</h3>:
        <h3>You Lose. Too Bad.</h3> }</div>}
        {!isCurrent && tempTurnNum === turnNum? <h3>(Current Board)</h3>: !isCurrent? <h3>
         {turnNum - tempTurnNum} move(s) before current Board.
