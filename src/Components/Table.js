@@ -125,20 +125,24 @@ function Table({token,
                         return<td key = {indx2} className = {classes} onClick = {async () => {
                             if(cell.occupied) return;
                             let isLegal = true;
-                            // if(!(moveHistory.length % 2))
-                            // {
-                            //     const violations = await getViolations(history, game.rows, game.cols, game.overline, game.threeThree, game.fourFour);
-                            //     console.log("violations", violations);
-                            //     if(violations.overline || violations.threeThree || violations.fourFour)
-                            //     {
-                            //       isLegal = false;
-                            //     }
-                            // }
 
                             if(future)
                             {
+                                if(winLines.length) return;
                                 let fm = futureMoves.slice(0, futureTurnNum);
-                                fm.push({row: indx, col: indx2, future: true, illegal: !isLegal});
+                                fm.push({row: indx, col: indx2, future: true});
+                                if(!((tempTurnNum + fm.length )% 2))
+                                {
+                                    console.log("logging")
+                                    const violations = await getViolations(moveHistory.slice(0, tempTurnNum -1).concat(fm), game.rows, game.cols, game.overline, game.threeThree, game.fourFour);
+                                    console.log("violations", violations);
+                                    if(violations.overline || violations.threeThree || violations.fourFour)
+                                    {
+                                    isLegal = false;
+                                    }
+                                }
+
+                                fm[fm.length - 1].illegal = !isLegal;
                                 setFutureMoves(fm);
                                 setUsedHistory(moveHistory.slice(0, tempTurnNum -1).concat(fm));
                                 setFutureTurnNum(fm.length);
@@ -150,7 +154,7 @@ function Table({token,
                                 cell.occupied = true;
                                 let history = moveHistory;
                                 history.push({row: indx, col: indx2});
-                                if((moveHistory.length % 2))
+                                if((history.length % 2))
                                 {
                                     const violations = await getViolations(history, game.rows, game.cols, game.overline, game.threeThree, game.fourFour);
                                     console.log("violations", violations);
@@ -163,7 +167,6 @@ function Table({token,
                                 if(game.givewarning && !isLegal)
                                 {
                                     cont = confirm('This is an illegal move. Make move anyway?');
-                                    if(!cont) history.pop();
                                 }
                                 if(!cont){
                                     cell.occupied = false;
