@@ -124,10 +124,21 @@ function Table({token,
                         if(style == "go" && inWin.length != 0) circleClasses += " winBorder"
                         return<td key = {indx2} className = {classes} onClick = {async () => {
                             if(cell.occupied) return;
+                            let isLegal = true;
+                            // if(!(moveHistory.length % 2))
+                            // {
+                            //     const violations = await getViolations(history, game.rows, game.cols, game.overline, game.threeThree, game.fourFour);
+                            //     console.log("violations", violations);
+                            //     if(violations.overline || violations.threeThree || violations.fourFour)
+                            //     {
+                            //       isLegal = false;
+                            //     }
+                            // }
+
                             if(future)
                             {
                                 let fm = futureMoves.slice(0, futureTurnNum);
-                                fm.push({row: indx, col: indx2, future: true});
+                                fm.push({row: indx, col: indx2, future: true, illegal: !isLegal});
                                 setFutureMoves(fm);
                                 setUsedHistory(moveHistory.slice(0, tempTurnNum -1).concat(fm));
                                 setFutureTurnNum(fm.length);
@@ -139,24 +150,26 @@ function Table({token,
                                 cell.occupied = true;
                                 let history = moveHistory;
                                 history.push({row: indx, col: indx2});
-                                let cont = true;
-                                console.log(game, game.givewarning)
-                                if(game.givewarning && moveHistory.length % 2)
+                                if((moveHistory.length % 2))
                                 {
-                                    console.log("in here");
                                     const violations = await getViolations(history, game.rows, game.cols, game.overline, game.threeThree, game.fourFour);
-                                    console.log(violations);
+                                    console.log("violations", violations);
                                     if(violations.overline || violations.threeThree || violations.fourFour)
                                     {
-                                        cont = confirm('This is an illegal move. Make move anyway?');
-                                        console.log(cont)
-                                        if(!cont) history.pop();
+                                    isLegal = false;
                                     }
+                                }
+                                let cont = true;
+                                if(game.givewarning && !isLegal)
+                                {
+                                    cont = confirm('This is an illegal move. Make move anyway?');
+                                    if(!cont) history.pop();
                                 }
                                 if(!cont){
                                     cell.occupied = false;
                                     cell.color = "none";
                                 } else{
+                                    history[history.length - 1].illegal = !isLegal;
                                     const updated = await updateMoveHistory(token, history, game);
                                     if(updated.error) {
                                         cell.occupied = false;
