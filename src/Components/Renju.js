@@ -7,7 +7,7 @@ import {getGame, getWinLines} from '../apiCalls/index';
 import {Table} from './Table'
 
 
-
+const Yes = (x) => x?"yes":"no";
 
 
 function Renju({token, username})
@@ -39,6 +39,11 @@ function Renju({token, username})
         setSocket(socket);
         return () => socket.disconnect();
     }, [setSocket])
+
+    useEffect(() => {
+        const storedStyle = localStorage.getItem('style');
+        if(storedStyle) setStyle(storedStyle);
+    }, [])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -86,7 +91,7 @@ function Renju({token, username})
 
     return<div>
        <h1>Renju</h1>
-       {winLines.length == 0 ? <div>{!game || tempTurnNum -1 !== game.rows * game.cols ?<h3>Turn {tempTurnNum + futureMoves.length} {turnPlayer.color}'s({turnPlayer.username}'s) move</h3>:
+       {winLines.length == 0 ? <div>{!game || tempTurnNum -1 !== game.rows * game.cols ?<div><h3 className = "inline">Turn {tempTurnNum + futureMoves.length}, </h3>{turnPlayer.username == username? <h3 className = "inline">Your </h3>:<h3 className = "inline">{turnPlayer.username}'s</h3> }<h3 className = "inline">({turnPlayer.color}) move!</h3></div>:
        <h3>Draw.</h3>}</div>:
        <div>{(winLines[0].color == "black" && game.playeroneusername == username) || (winLines[0].color == "white" && game.playertwousername == username)? <h3>Congratulations {username}({winLines[0].color}), you win!!!</h3>:
        <h3>You Lose. Too Bad.</h3> }</div>}
@@ -95,7 +100,10 @@ function Renju({token, username})
        </h3>: null}
        {otherMoved? <p> The other player has moved since you entered past/future mode</p>:null}
        <label>Board style: </label>
-       <select value = {style} onChange = {(event) =>{setStyle(event.target.value)}}>
+       <select value = {style} onChange = {(event) =>{
+           setStyle(event.target.value);
+           localStorage.setItem('style', event.target.value);
+           }}>
            <option value = "go"> Go Board </option>
            <option value = "x"> Tic-Tac-Toe </option>
        </select>
@@ -161,6 +169,10 @@ function Renju({token, username})
                                 futureTurnNum = {futureTurnNum}
                                 setFutureTurnNum = {setFutureTurnNum}
                                 />:null}
+       { game? <div className = "border">
+        <p>Rows: {game.rows} | Columns: {game.cols} | {game.towin} needed to win</p>
+        <p>No ThreeThree: {Yes(game.nothreethree)} | No FourFour: {Yes(game.nofourfour)} | No Overline: {Yes(game.nooverline)} | Warn of illegal Moves: {Yes(game.givewarning)}</p>
+        </div>: null}
     </div>
 }
 

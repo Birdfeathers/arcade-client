@@ -11,7 +11,7 @@ function Cross({rowNum, colNum, rows, cols})
          if(colNum != 0) topLeft += " borderBottom";
          if(rowNum != rows-1) bottomRight += " borderLeft";
          if(colNum != cols -1) topRight += " borderBottom";
-          return<div className = "tan">
+          return<div className = "box">
           <div className = "half">
             <div className = {topLeft}></div>
             <div className = {topRight}></div>
@@ -89,6 +89,13 @@ function isInWin(lineBoard, winLines, row, col)
     return returnValue;
 }
 
+function tableClass(style)
+{
+    let classList = "table";
+    if(style == "go") return classList + " wood";
+    return classList + " paper";
+}
+
 
 function Table({token,
                 style, 
@@ -111,7 +118,7 @@ function Table({token,
 {
     const {gameId} = useParams();
  
-    return<table cellSpacing = {0} cellPadding = {0}><tbody>
+    return<table cellSpacing = {0} cellPadding = {0} className = {tableClass(style)}><tbody>
             {lineBoard.map((row, indx) => {
                 return<tr key = {indx}>
                     {row.map((cell, indx2) =>{

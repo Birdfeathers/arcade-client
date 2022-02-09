@@ -63,27 +63,32 @@ td {
       background-color: azure;
   }
 
+  .table{
+    margin: 5%;
+  }
+
   .wood{
-      /* background-color: sandybrown; */
+      background-color: sandybrown;
       /* background-image: url('/images/wood.jpg'); */
       box-shadow: 5px 10px 10px black;
       /* background-repeat: no-repeat;
       background-size: cover; */
   }
 
-  .tan{
-      background-color: sandybrown;
+  .box{
+      /* background-color: sandybrown; */
       height: 100%;
   }
   
   
 
 .paper{
-    background-image: url('/images/paper.jpg');
+    /* background-image: url('/images/paper.jpg'); */
     padding: 5px;
     box-shadow: 2px 4px black;
-    background-repeat: no-repeat;
-    background-size: cover;
+    background-color: white;
+    /* background-repeat: no-repeat;
+    background-size: cover; */
 }
 
   .fourth{
@@ -193,6 +198,13 @@ td {
 
   .translucent{
       opacity: 40%;
+  }
+
+  .redText{
+      color:red;
+  }
+  .inline{
+      display: inline;
   }
 
   @media screen and (max-width: 768px)
