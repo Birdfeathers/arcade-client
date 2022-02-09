@@ -11,7 +11,7 @@ function Cross({rowNum, colNum, rows, cols})
          if(colNum != 0) topLeft += " borderBottom";
          if(rowNum != rows-1) bottomRight += " borderLeft";
          if(colNum != cols -1) topRight += " borderBottom";
-          return<div className = "box">
+          return<div className = "full">
           <div className = "half">
             <div className = {topLeft}></div>
             <div className = {topRight}></div>
@@ -163,9 +163,10 @@ function Table({token,
                                 history.push({row: indx, col: indx2});
                                 if((history.length % 2))
                                 {
-                                    const violations = await getViolations(history, game.rows, game.cols, game.overline, game.threeThree, game.fourFour);
+                                    const violations = await getViolations(history, game.rows, game.cols, game.nooverline, game.nothreethree, game.nofourfour);
+                                    console.log("lllll",game)
                                     console.log("violations", violations);
-                                    if(violations.overline || violations.threeThree || violations.fourFour)
+                                    if((violations.overline && game.nothreethree)|| (violations.threeThree && game.nofourfour) || (violations.fourFour && game.nofourfour))
                                     {
                                     isLegal = false;
                                     }

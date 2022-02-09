@@ -28,7 +28,7 @@ function RenjuForm({token})
       }, []);
     let arr1 = [];
     let counter = 0;
-    for(let i = 3; i < 16; i++)
+    for(let i = 3; i < 20; i++)
     {
         arr1[counter] = i;
         counter++;
