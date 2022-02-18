@@ -1,5 +1,5 @@
 import {register, login, getAllUsers,getUserById, updatePassword} from './users';
-import { newGame, getGame, getGamesByUser, updateMoveHistory, getWinLines, getViolations } from './games';
+import { newGame, getGame, getGamesByUser, updateMoveHistory, getWinLines, getViolations, updateStatus, deleteGame } from './games';
 
 export {
     login,
@@ -12,7 +12,9 @@ export {
     getGamesByUser,
     updateMoveHistory,
     getWinLines,
-    getViolations
+    getViolations,
+    updateStatus,
+    deleteGame
 }
 
 

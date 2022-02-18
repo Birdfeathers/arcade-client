@@ -89,6 +89,48 @@ export async function updateMoveHistory(token, moveHistory, game)
     }
 }
 
+export async function updateStatus(token, gameId, status)
+{
+    try{
+        const response = await fetch(BaseUrl + 'games/status/' + gameId, {
+            method: "PATCH",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body : JSON.stringify({
+               status
+            })
+        });
+        const result = await response.json();
+
+        console.log(result);
+        return result;
+
+    } catch(error) {
+        throw error;
+    }
+}
+
+export async function deleteGame(token, gameId) {
+    try {
+      const response = await fetch(BaseUrl + 'games/' + gameId, {
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      const result = await response.json();
+      console.log(result);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
 export async function getWinLines(moveHistory, rows, cols, towin)
 {
     try{

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import socketIOClient from "socket.io-client";
 import { BaseUrl as ENDPOINT } from "./constants";
-import {Renju, RenjuForm, Home, Login, Register, Profile} from './Components'
+import {Renju, RenjuForm, Home, Login, Register, Profile, PendingGames} from './Components'
 import { useNavigate } from "react-router-dom";
 
 function App() {
@@ -24,21 +24,32 @@ function App() {
   }, [token]);
 
   return<Router>
-    {token? <div>Logged in as {username}</div>: <div>You are not logged in</div>}
-    <div id = "nav" >
-        <Link to = '/'>Home</Link>
-        { token?<>
-        <Link to = '/profile'> Profile </Link>
-        <Link to = '/' onClick = {() => {
+    {token? <div>
+        <p className = "inline" >Logged in as {username}  </p>
+        <button className = "inline" onClick = {() => {
           if(window.confirm('Are you sure you want to log out?'))
           {
-            //let navigate = useNavigate();
             setToken('');
             setUsername('');
             localStorage.removeItem('token');
             localStorage.removeItem('username');
-            //navigate("../login");
-          } }}> Logout</Link>
+            window.location='/login';
+          }}}>Logout</button>
+        </div>
+          : <div><p>You are not logged in</p></div>}
+    <div id = "nav" >
+        <Link to = '/'>Home</Link>
+        { token?<>
+        <Link to = '/profile'> Profile </Link>
+        {/* <Link to = '/login' onClick = {() => {
+          if(window.confirm('Are you sure you want to log out?'))
+          {
+            setToken('');
+            setUsername('');
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+          } }}> Logout</Link> */}
+          <Link to = '/pendinggames' >PendingGames</Link>
         </>: <>
           <Link to = '/login'>Login</Link>
           <Link to = '/register'>Register</Link>
@@ -53,6 +64,7 @@ function App() {
       <Route path = '/login' element = {<Login setToken = {setToken}/>}></Route>
       <Route path = '/register' element = {<Register setToken = {setToken}/>}></Route>
       <Route path = '/profile' element = {<Profile username = {username} token = {token} />}></Route>
+      <Route path = '/pendinggames' element = {<PendingGames />}></Route>
     </Routes>
   </Router>
 }
