@@ -206,6 +206,7 @@ td {
   .gamecard{
       margin: 5%;
       padding: 3%;
+      background-color: white;
   }
 
   @media screen and (max-width: 768px)
