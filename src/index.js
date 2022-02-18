@@ -64,7 +64,7 @@ function App() {
       <Route path = '/login' element = {<Login setToken = {setToken}/>}></Route>
       <Route path = '/register' element = {<Register setToken = {setToken}/>}></Route>
       <Route path = '/profile' element = {<Profile username = {username} token = {token} />}></Route>
-      <Route path = '/pendinggames' element = {<PendingGames />}></Route>
+      <Route path = '/pendinggames' element = {<PendingGames token = {token} username = {username}/>}></Route>
     </Routes>
   </Router>
 }

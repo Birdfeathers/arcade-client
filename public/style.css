@@ -203,6 +203,11 @@ td {
       display: inline;
   }
 
+  .gamecard{
+      margin: 5%;
+      padding: 3%;
+  }
+
   @media screen and (max-width: 768px)
   {
       form{

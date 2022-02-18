@@ -58,7 +58,7 @@ function GameCard({token, username, game, mode})
             let turnDate = new Date(game.lastupdate);
             let lastPlayed = currentDate - turnDate;
 
-        return<div key = {game.id} className = "border" onClick = {(event) => {
+        return<div key = {game.id} className = "border gamecard" onClick = {(event) => {
             if(game.status == "pending") return;
             navigate(`../renju/${game.id}`);
         }}> 

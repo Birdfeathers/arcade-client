@@ -46,7 +46,7 @@ function RenjuForm({token})
                 const game = await newGame(token, rows, cols, toWin, against, goesFirst, Number(overline), Number(threeThree), Number(fourFour), Number(giveWarning));
                 if(game.error) alert(game.message);
                 console.log(game);
-                navigate(`../renju/${game.id}`);
+                navigate(`../pendinggames`);
             }
 
        }}>
