@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { updateStatus, deleteGame} from '../apiCalls/index';
+import { updateStatus, deleteGame, getGame} from '../apiCalls/index';
 
 function convertMilliseconds(mill)
 {
@@ -39,57 +39,80 @@ function convertDate(date)
 
 const Yes = (x) => x?"yes":"no";
 
-function GameCard({token, username, game, mode})
+function GameCard({token, username, game, mode, socket})
 {
     let navigate = useNavigate();
+    const [deleted, setDeleted] = useState(false);
+    const [currentMode, setCurrentMode] = useState(mode)
+    const [currentGame, setCurrentGame] = useState(game);
+    useEffect(() => {
+        if(socket){
+            socket.on("delete" + currentGame.id, () => {
+            setDeleted(true);
+            })
+
+            socket.on('activated', id => {
+                if(id != currentGame.id) return;
+                setCurrentMode('active')
+            })
+
+            socket.on('game' + currentGame.id, async () => {
+                let game = await getGame(currentGame.id);
+                setCurrentGame(game);
+                setCurrentMode(game.status);
+            })
+        }
+    }, [socket])
     let winner;
-            if(game.winner == "black") winner = game.playeroneusername;
-            else if(game.winner == "white")winner = game.playertwousername;
+            if(currentGame.winner == "black") winner = currentGame.playeroneusername;
+            else if(currentGame.winner == "white")winner = currentGame.playertwousername;
             else winner = "tie";
             let turn = 1;
-            let turnPlayer = game.playeroneusername
-            if(game.movehistory){
-                turn = JSON.parse(game.movehistory).length + 1;
-                if(turn % 2) turnPlayer = game.playeroneusername;
-                else turnPlayer = game.playertwousername;
+            let turnPlayer = currentGame.playeroneusername
+            if(currentGame.movehistory){
+                turn = JSON.parse(currentGame.movehistory).length + 1;
+                if(turn % 2) turnPlayer = currentGame.playeroneusername;
+                else turnPlayer = currentGame.playertwousername;
             }
             let currentDate = new Date();
-            let startDate = new Date(game.timecreated);
-            let turnDate = new Date(game.lastupdate);
+            let startDate = new Date(currentGame.timecreated);
+            let turnDate = new Date(currentGame.lastupdate);
             let lastPlayed = currentDate - turnDate;
 
-        return<div key = {game.id} className = "border gamecard" onClick = {(event) => {
-            if(game.status == "pending") return;
-            navigate(`../renju/${game.id}`);
+        return(<div>{!deleted ? <div className = "border gamecard" onClick = {(event) => {
+            if(currentMode == "pending") return;
+            navigate(`../renju/${currentGame.id}`);
         }}> 
-            <h4>Game Number {game.id}</h4>
-            {mode == "complete"? <p>winner: {winner}</p>:
+            <h4>Game Number {currentGame.id}</h4>
+            {currentMode == "complete"? <p>winner: {winner}</p>:
             <div>
-                {mode == "active"?<div>{turnPlayer == username? <p className = "redText">Your turn</p>: <p>{turnPlayer}'s turn</p>}</div>:
+                {currentMode == "active"?<div>{turnPlayer == username? <p className = "redText">Your turn</p>: <p>{turnPlayer}'s turn</p>}</div>:
                 <div>
                     <p>Game pending: </p>
-                    {(game.ownerusername != username || game.playeroneusername == game.playertwousername)?<div>
+                    {(currentGame.ownerusername != username || currentGame.playeroneusername == currentGame.playertwousername)?<div>
                         <button onClick = {() =>{
-                            updateStatus(token, game.id, "active");
-                            navigate(`../renju/${game.id}`);
+                            updateStatus(token, currentGame.id, "active");
+                            socket.emit('activated', currentGame.id);
+                            navigate(`../renju/${currentGame.id}`);
                         }}>Accept</button>
                         <button onClick = {async () => {
-                            deleteGame(token, game.id);
+                            deleteGame(token, currentGame.id);
+                            socket.emit('delete', currentGame.id);
                         }}>Decline</button>
                     </div>:<div>
-                        <p>Waiting for opponent to accept.</p>
                         <button onClick = {() => {
-                            deleteGame(token, game.id);
+                            deleteGame(token, currentGame.id);
+                            socket.emit('delete', currentGame.id);
                         }}>Withdraw Game</button>
                         </div>}
                 </div>}
             </div>}
             <p>Last Updated {convertMilliseconds(lastPlayed)} ago</p>
-            <p>Started by: {game.ownerusername}  at {convertTime(startDate)} on {convertDate(startDate)}</p>
-            <p> First Player: {game.playeroneusername} | Second Player: {game.playertwousername}</p>
-            <p>Rows: {game.rows} | Columns: {game.cols} | {game.towin} needed to win</p>
-            <p>No ThreeThree: {Yes(game.nothreethree)} | No FourFour: {Yes(game.nofourfour)} | No Overline: {Yes(game.nooverline)} | Warn of illegal Moves: {Yes(game.givewarning)}</p>
-        </div>
+            <p>Started by: {currentGame.ownerusername}  at {convertTime(startDate)} on {convertDate(startDate)}</p>
+            <p> First Player: {currentGame.playeroneusername} | Second Player: {currentGame.playertwousername}</p>
+            <p>Rows: {currentGame.rows} | Columns: {currentGame.cols} | {currentGame.towin} needed to win</p>
+            <p>No ThreeThree: {Yes(currentGame.nothreethree)} | No FourFour: {Yes(currentGame.nofourfour)} | No Overline: {Yes(currentGame.nooverline)} | Warn of illegal Moves: {Yes(currentGame.givewarning)}</p>
+        </div>: null}</div>)
 }
 
 export default GameCard;

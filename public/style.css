@@ -204,9 +204,14 @@ td {
   }
 
   .gamecard{
-      margin: 5%;
-      padding: 3%;
+      margin: 3%;
+      padding: 1%;
       background-color: white;
+      display: flex;
+      flex-direction: column;
+      
+      align-items: center;
+      justify-content: center;
   }
 
   @media screen and (max-width: 768px)

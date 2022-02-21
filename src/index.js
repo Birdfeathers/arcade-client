@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 function App() {
   const [token, setToken] = useState('');
   const [username, setUsername] = useState('');
-
+  const [socket, setSocket] = useState('');
   useEffect(() => {
     const fetchData = async () => {
       console.log('useEffect running')
@@ -22,6 +22,13 @@ function App() {
     }
     fetchData();
   }, [token]);
+
+  useEffect(() => {
+    console.log('useEffect for setting socket running');
+    const socket = socketIOClient(ENDPOINT,{ transports : ['websocket'] });
+    setSocket(socket);
+    return () => socket.disconnect();
+}, [setSocket])
 
   return<Router>
     {token? <div>
@@ -59,12 +66,12 @@ function App() {
     </div>
     <Routes>
       <Route path = '/' element = {<Home token = {token}/>}></Route>
-      <Route path = '/renju/:gameId' element={<Renju token = {token} username = {username} />}></Route>
-      <Route path = '/renjuform' element = {<RenjuForm token = {token}/>}></Route>
+      <Route path = '/renju/:gameId' element={<Renju token = {token} username = {username} socket = {socket}/>}></Route>
+      <Route path = '/renjuform' element = {<RenjuForm token = {token} socket = {socket}/>}></Route>
       <Route path = '/login' element = {<Login setToken = {setToken}/>}></Route>
       <Route path = '/register' element = {<Register setToken = {setToken}/>}></Route>
-      <Route path = '/profile' element = {<Profile username = {username} token = {token} />}></Route>
-      <Route path = '/pendinggames' element = {<PendingGames token = {token} username = {username}/>}></Route>
+      <Route path = '/profile' element = {<Profile username = {username} token = {token} socket = {socket}/>}></Route>
+      <Route path = '/pendinggames' element = {<PendingGames token = {token} username = {username} socket = {socket}/>}></Route>
     </Routes>
   </Router>
 }

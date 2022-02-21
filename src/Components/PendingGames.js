@@ -12,7 +12,7 @@ function sortGames(games)
     return sortedGames;
 }
 
-function PendingGames({token, username})
+function PendingGames({token, username, socket})
 {
     const [myGames, setMyGames] = useState([]);
     useEffect(() => {
@@ -25,15 +25,26 @@ function PendingGames({token, username})
         }}
         fetchData();
     }, [token]);
+
+    useEffect(() => {
+        if(socket)socket.on("created", async () => {
+            if(!token) return;
+          const games = await getGamesByUser(token);
+          if(games){
+          setMyGames(sortGames(games.filter(game => {return game.status == "pending";})));
+          }
+        })
+    }, [socket])
+
     return<div>
         <h1>PendingGames</h1>
         <h3>Games started by you: </h3>
         {myGames.filter(game => game.ownerusername == username).map(game => {
-            return <GameCard key = {game.id} token = {token} username = {username} game = {game} mode = "pending"/>
+            return <GameCard key = {game.id} token = {token} username = {username} game = {game} mode = "pending" socket = {socket}/>
         })}
         <h3>Games you were invited to: </h3>
         {myGames.filter(game => game.ownerusername != username).map(game => {
-            return <GameCard key = {game.id} token = {token} username = {username} game = {game} mode = "pending"/>
+            return <GameCard key = {game.id} token = {token} username = {username} game = {game} mode = "pending" socket = {socket}/>
         })}
     </div>
 

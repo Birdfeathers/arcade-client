@@ -10,7 +10,7 @@ import {Table} from './Table'
 const Yes = (x) => x?"yes":"no";
 
 
-function Renju({token, username})
+function Renju({token, username, socket})
 {
     const {gameId} = useParams();
     const [game, setGame] = useState(null);
@@ -20,7 +20,7 @@ function Renju({token, username})
     const [turnNum, setTurnNum] = useState(0);
     const [tempTurnNum, setTempTurnNum] = useState(0);
     const [turnPlayer, setTurnPlayer] = useState("");
-    const [socket, setSocket] = useState(null);
+    // const [socket, setSocket] = useState(null);
     const [winLines, setWinLines] = useState([]);
     const [lineBoard, setLineBoard] = useState([]);
     const [future, setFuture] = useState(false);
@@ -31,14 +31,10 @@ function Renju({token, username})
 
 
     useEffect(() => {
-        console.log('useEffect for setting socket running');
-        const socket = socketIOClient(ENDPOINT,{ transports : ['websocket'] });
-        socket.on("game" + gameId, move => {
+        if(socket)socket.on("game" + gameId, move => {
             setMoveHistory(move.history);
         })
-        setSocket(socket);
-        return () => socket.disconnect();
-    }, [setSocket])
+    }, [socket])
 
     useEffect(() => {
         const storedStyle = localStorage.getItem('style');

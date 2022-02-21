@@ -43,7 +43,7 @@ function sortGames(games)
 }
 
 
-function MyGames({token, username})
+function MyGames({token, username, socket})
 {
     const [games, setGames] = useState([]);
     const [mode, setMode] = useState("active");
@@ -51,13 +51,37 @@ function MyGames({token, username})
         const fetchData = async () => {
           console.log('useEffect running');
           if(!token) return;
-          const games = await getGamesByUser(token);
-          if(games){
-          setGames(sortGames(games));
+          const games1 = await getGamesByUser(token);
+          if(games1){
+          setGames(sortGames(games1));
         }
     }
         fetchData();
       }, [token]);
+
+      useEffect(() => {
+        if(socket){
+        socket.on("created", async () => {
+            console.log("in socket");
+        if(!token) return;
+          const games1 = await getGamesByUser(token);
+          if(games1){
+            setGames(sortGames(games1));
+          }
+        })
+
+        socket.on('activated', async () => {
+            console.log("in socket");
+        if(!token) return;
+          const games1 = await getGamesByUser(token);
+          if(games1){
+            setGames(sortGames(games1));
+          }
+        })
+    }
+
+    }, [socket])
+
       return<>
         <h3>Games:</h3>
         <select value = {mode} onChange = {(event) => {setMode(event.target.value)}}>
@@ -66,13 +90,13 @@ function MyGames({token, username})
             <option value = "pending">Pending</option>
         </select>
         { games.filter(game => {return game.status == mode;}).map((game) => {
-        return <GameCard key = {game.id} token = {token} username = {username} game = {game} mode = {mode}/>
+        return <GameCard key = {game.id} token = {token} username = {username} game = {game} mode = {mode} socket  = {socket}/>
     })}
 
       </>
 }
 
-function Profile({username, token})
+function Profile({username, token, socket})
 {
     const [passwordOpen, setPasswordOpen] = useState(false);
     return <div>
@@ -82,7 +106,7 @@ function Profile({username, token})
         }}> Change password</button>
         {passwordOpen? <ChangeUserPassword token = {token} username = {username} setPasswordOpen = {setPasswordOpen}/>: null}
         {token? <Link to = '/renjuform'><button>Create New Tic-Tac-Toe/Renju Game</button></Link>: null}
-        <MyGames token = {token} username = {username}/>
+        <MyGames token = {token} username = {username} socket = {socket}/>
 
     </div>
 }

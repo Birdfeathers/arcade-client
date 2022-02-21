@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {getAllUsers, newGame} from '../apiCalls/index';
 import { useNavigate } from "react-router-dom";
 
-function RenjuForm({token})
+function RenjuForm({token, socket})
 {
     const [players, setPlayers] = useState([]);
     const [rows, setRows] = useState(3);
@@ -46,6 +46,7 @@ function RenjuForm({token})
                 const game = await newGame(token, rows, cols, toWin, against, goesFirst, Number(overline), Number(threeThree), Number(fourFour), Number(giveWarning));
                 if(game.error) alert(game.message);
                 console.log(game);
+                socket.emit('created', game);
                 navigate(`../pendinggames`);
             }
 
