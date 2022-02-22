@@ -70,7 +70,6 @@ function MyGames({token, username, socket})
         })
 
         socket.on('activated', async () => {
-            console.log("in socket");
         if(!token) return;
           const games1 = await getGamesByUser(token);
           if(games1){
