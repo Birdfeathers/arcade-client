@@ -62,7 +62,6 @@ function MyGames({token, username, socket})
       useEffect(() => {
         if(socket){
         socket.on("created", async () => {
-            console.log("in socket");
         if(!token) return;
           const games1 = await getGamesByUser(token);
           if(games1){
@@ -78,6 +77,14 @@ function MyGames({token, username, socket})
             setGames(sortGames(games1));
           }
         })
+
+        socket.on("game", async () => {
+          if(!token) return;
+            const games1 = await getGamesByUser(token);
+            if(games1){
+              setGames(sortGames(games1));
+            }
+          })
     }
 
     }, [socket])

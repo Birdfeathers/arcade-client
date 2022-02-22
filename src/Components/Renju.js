@@ -20,7 +20,6 @@ function Renju({token, username, socket})
     const [turnNum, setTurnNum] = useState(0);
     const [tempTurnNum, setTempTurnNum] = useState(0);
     const [turnPlayer, setTurnPlayer] = useState("");
-    // const [socket, setSocket] = useState(null);
     const [winLines, setWinLines] = useState([]);
     const [lineBoard, setLineBoard] = useState([]);
     const [future, setFuture] = useState(false);
@@ -31,7 +30,8 @@ function Renju({token, username, socket})
 
 
     useEffect(() => {
-        if(socket)socket.on("game" + gameId, move => {
+        if(socket)socket.on("game", move => {
+            if(move.game != gameId) return;
             setMoveHistory(move.history);
         })
     }, [socket])

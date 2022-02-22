@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {updateMoveHistory} from '../apiCalls/index';
 import { useParams } from 'react-router-dom';
-import socketIOClient from "socket.io-client";
 import { BaseUrl as ENDPOINT } from "../constants";
 import {getGame, getWinLines, getViolations} from '../apiCalls/index';
 
